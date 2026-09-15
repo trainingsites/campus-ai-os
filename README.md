@@ -12,7 +12,7 @@
 </p>
 
 <p align="center">
-  <a href="#get-it-running">Install</a> · <a href="#see-it-work">See it work</a> · <a href="#how-it-is-built">How it is built</a> · <a href="#what-is-included">What is included</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Security</a> · <a href="https://trainingsites.io/os">Non-developer install</a>
+  <a href="#who-this-is-for">Who it is for</a> · <a href="#nothing-to-install-but-a-plugin">Nothing to install</a> · <a href="#get-it-running">Install</a> · <a href="#see-it-work">See it work</a> · <a href="#your-second-brain">Second brain</a> · <a href="#what-is-included">What is included</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Security</a> · <a href="https://trainingsites.io/os">Non-developer install</a>
 </p>
 
 # Campus AI OS
@@ -24,6 +24,12 @@ Campus AI OS turns a folder into the operating system for your business. It give
 It is free, open source, and MIT-licensed. Your business remains in files you own: mostly Markdown and JSON, with no server or database required.
 
 > Not a developer? [Download Campus AI OS free at TrainingSites.io](https://trainingsites.io/os). It is the same release, with the simplest installation path.
+
+## Who this is for
+
+You run a one-person business: coaching, teaching, courses, consulting, a small practice. You are the marketing department, the sales department, the community manager and the teacher, and there is no one to hand work to. You do not want to become a prompt engineer. You want a staff that knows your business, does the routine work well, and asks you only for the decisions that are yours.
+
+Campus AI OS is built for exactly that owner. It is not a personal assistant for email and calendars. It is an operating system for the whole business, run by one person, with AI doing the jobs you used to skip.
 
 ## See it work
 
@@ -53,20 +59,39 @@ More walkthroughs: [My full agent setup on Campus OS](https://www.youtube.com/wa
 
 One campus, one clock. Several clients can be primary on the same installation and finish work where they are; only the clock owner runs schedules and writes the shared ledger. See [PLATFORM.md](PLATFORM.md).
 
+## Your second brain
+
+Chat memory belongs to the vendor and fades. A campus remembers because it writes things down.
+
+- **Every run leaves a record.** Each playbook writes a results file: what ran, what it produced, whether it finished, whether you approved it. The activity ledger logs who did what and from which client.
+- **Finished work becomes knowledge.** `/wiki-ingest` turns a recording, a session, a decision or a completed deliverable into wiki pages your staff can read next time. `/wiki-query` answers questions from that accumulated knowledge instead of from a blank slate.
+- **Dean reads it all back.** Priorities, the morning brief, the weekly review and the Campus Map are built from your files, so the advice gets more specific the longer you run the campus.
+- **It is yours.** Plain files in your folder. Open them, edit them, back them up, move them. Nothing is locked inside a product.
+
+The staff does not get better because the model changed. It gets better because your business is written down and every job starts from that.
+
+## Nothing to install but a plugin
+
+There is no server, no database, no account to create and no API keys to manage. On the Claude Desktop path there is no terminal either. You install one plugin, connect an empty folder, and answer questions one at a time. Everything your staff learns is written into that folder as ordinary Markdown and JSON files. Your business stays on your machine, readable by you, and it moves when the folder moves.
+
+Honest note: the founding interview takes real attention, and the first run will surface things you have never written down. That is the point. The Claude Code and Codex paths below are for developers and do use a terminal.
+
 ## Get it running
 
-### Claude Desktop or Cowork
+### Claude Desktop or Cowork (no terminal)
 
 Download `campus-ai-os-v5.2.9.plugin` from the [latest release](https://github.com/trainingsites/campus-ai-os/releases/latest), then install it from **Settings → Plugins → Install from file**.
 
-### Claude Code
+### Developer paths
+
+#### Claude Code
 
 ```text
 /plugin marketplace add trainingsites/campus-ai-os
 /plugin install campus-ai-os@campus-ai-os
 ```
 
-### Codex
+#### Codex
 
 Open **Settings → Plugins → Add marketplace**, choose a Git source, and enter:
 
@@ -121,25 +146,7 @@ Departments provide ownership. Playbooks provide sequence and verification. Skil
 
 ## What is new in v5.2.9
 
-Version 5.2.9 makes one Campus safe to use from multiple AI applications on the same computer.
-
-- **Work from whichever client is open.** Claude Desktop, Claude Code, and Codex can each be recognized as primary clients on the same owner installation. Any recognized client can finish its own work, close tasks, and update shared context.
-- **One campus, one clock.** Exactly one configured client owns recurring jobs and the shared activity ledger. Other primary clients write to their own ledger shards, preventing duplicate schedules.
-- **Unknown clients remain contained.** An unrecognized computer, unassigned client, expired host binding, or unbound sandbox still resolves as a satellite with restricted write access.
-- **The doctor understands co-primary campuses.** Legitimate work from another recognized client is no longer reported as unresolved attribution, while unknown writers are still flagged.
-- **226 automated fixtures.** Seventeen new co-primary tests cover role resolution, clock ownership, ledger routing, host binding, backward compatibility, and the unchanged satellite boundary.
-
-Existing single-primary campuses continue to work as before. Co-primary support changes collaboration on one recognized installation; it does not broaden who is trusted.
-
-### Security work carried forward from v5.2.6–v5.2.8
-
-- Blocked path traversal and symlink escape from the Campus Map generator.
-- Blocked stored script injection through Markdown link targets and unsafe brand fields.
-- Added Content Security Policy protection to generated Campus Maps.
-- Removed the public or sales-demo Campus Map build. Campus Maps are private workspace artifacts only.
-- Added an offline mode for private Campus Maps that makes no font request.
-
-See [CHANGELOG.md](CHANGELOG.md) for the complete release history and [SECURITY.md](SECURITY.md) for the operating boundary.
+One campus is now safe to use from several AI applications on the same computer. Claude Desktop, Claude Code and Codex can each finish work in place; one configured client owns schedules and the shared ledger, and unknown clients stay contained. 226 automated fixtures back the release. Full detail in [CHANGELOG.md](CHANGELOG.md); the security work from 5.2.6 through 5.2.8 is summarised in [SECURITY.md](SECURITY.md).
 
 ---
 
