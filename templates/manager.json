@@ -1,0 +1,65 @@
+{
+  "$schema_version": "manager-contract/v1",
+  "_what_this_is": "A LOCAL OVERRIDE. Copy this into {your-department-folder}/manager.json only when you want to change what the pack already declares. The pack's managers[] is the default and works untouched - you do not need this file to have a working manager.",
+
+  "_the_contract": "A department is a MANAGER only if it has all three: owned state (one file answering 'what is the situation here'), a cadence (scheduled work that advances that state unprompted), and a gate (explicit publish authority per surface). Missing any one and it is a folder, not a manager. tools/lint_managers.py enforces this - it is code, not a suggestion.",
+
+  "id": "marketing",
+  "_id_note": "Logical key. Stable WITHIN your campus. NOT a product-wide constant - rename it if your business calls this something else.",
+
+  "display_name": "Media Desk",
+  "_display_name_note": "Cosmetic. Change this freely; nothing downstream notices. This is the ONLY layer a rename should touch.",
+
+  "dept_dir": "departments/marketing/",
+  "_dept_dir_note": "Your actual folder. It may be 'marketing/', 'departments/marketing/', 'marketing-manager/', or 'the-studio/' - whatever you actually named it. Nothing may assume dept_dir == id + '/'. On a clients or projects campus this folder may not exist at all, and that is fine: the staff org is separate from how you file finished work.",
+
+  "reports_to": "dean",
+
+  "shape": "calendar",
+  "_shape_note": "CLOSED enum: calendar | pipeline | roster | hybrid. Shapes describe HOW STATE MOVES, not what business you run. calendar = dated slots. pipeline = ordered stages with per-item aging. roster = people with per-person status. hybrid = a lifecycle that is both. A fifth shape is a kernel change and a version bump, not a config edit - so pick the closest fit rather than inventing one.",
+
+  "state_file": "departments/marketing/content-calendar.md",
+  "_state_file_note": "A LITERAL path. Never write this as '{id}/something.md' and never let a consumer build it from the id - the first campus this shipped on has folders named '{dept}-manager/', so a derived path would have gone looking for a folder that does not exist on day one. Declare it; do not compute it.",
+  "state_stale_after_days": 8,
+  "_stale_note": "A manager that stops advancing its state has stopped managing. This is how long silence is acceptable before the doctor says so.",
+
+  "cadence": [
+    {
+      "task": "weekly-content-planning",
+      "definition": "scheduled/weekly-content-planning.md",
+      "cron": "0 17 * * 5",
+      "timezone": "America/Toronto",
+      "enabled": false,
+      "model_tier": "light",
+      "advances": "fills next week's open slots; queues production jobs"
+    }
+  ],
+  "_cadence_note": "enabled:false is the shipped default - recurring work costs money, so it switches on when YOU say so, not at install. model_tier: light|full. Planning may run light; voice-carrying copy and anything that publishes stay pinned full, always.",
+
+  "gates": {
+    "social": {
+      "mode": "draft",
+      "_modes": "auto | draft | owner_batch_gate | dark",
+      "_mode_note": "auto = publishes without asking (requires a preflight). draft = writes, you send. owner_batch_gate = queues for one approval pass. dark = not this desk's surface at all.",
+      "preflight": "Required for auto. Publish authority is permission to post, not permission to skip checks."
+    },
+    "email": { "mode": "draft" },
+    "community": { "mode": "dark", "note": "One desk owns a surface, never two." }
+  },
+
+  "buyer_defaults": {
+    "all_surfaces": "draft",
+    "grants_set_during": "onboarding interview",
+    "_locked": "This MUST stay 'draft'. lint_managers.py treats anything else as an error. If you package your campus for someone else, their install ships all-draft-first regardless of what you grant yourself - they have not heard their own voice come back yet, and their first live post should be one they approved."
+  },
+
+  "interop": {
+    "mints_run_id": true,
+    "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+    "writes_results_json": true,
+    "activity_ledger": "dean/.activity.jsonl",
+    "run_dir": "outputs/{YYYY-MM}/runs/managers/marketing/{run_id}/"
+  },
+
+  "_check_your_work": "python3 tools/lint_managers.py --campus <your campus root>"
+}

@@ -1,0 +1,89 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "campus-ai-os:results.schema.json",
+  "title": "results.json — Campus AI OS back socket, envelope v1.1",
+  "description": "ONE envelope for every emitter (Campus AI OS 5.2.0 Phase 3.1, merged plan D1). v1.1 = the Interop v1 asset ledger (`assets[]`, kernel readers unchanged) PLUS a required run-level `completion` (what mint-run-id has always written) PLUS optional `bindings[]` (who ran each stage, R2). This file is the canonical home; library/teams/_foundry/schemas/results.schema.json is a byte-identical copy enforced by the kernel fixtures. WRITE side: every field here, `schema_version` \"1.1\". READ side: tools/validate_results.py accepts 1.0 / missing / \"1.1-completion-only\" documents as legacy and never fails a reader on them (Interop spec §6; Codex critique 2026-09-05 #2).",
+  "type": "object",
+  "required": ["schema_version", "run_id", "team", "generated_at", "assets", "completion"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.1"],
+      "$comment": "Envelope version only. The emitter PROFILE goes in `profile`; never smuggle a profile name into this field (the 1.1-completion-only lesson, Foundry CANON Break 5)."
+    },
+    "profile": {
+      "type": "string",
+      "enum": ["completion-only", "full"],
+      "$comment": "completion-only = saleable teams: assets carry external_ref + completion and omit performance. full = owner-side emitters that may attach performance."
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]*-[0-9]{8}-[0-9]{6}([0-9]{3}(-[0-9a-f]{4})?)?$",
+      "$comment": "Minted by tools/mint_run_id.py: {slug}-{YYYYMMDD-HHMMSSfff}[-xxxx]. The 6-digit form is accepted so teams still minting inline (scaffold-team text, until item 3.5) validate. Never invented by the model."
+    },
+    "team": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+      "$comment": "The emitting team's registry `team` id. Playbook runs write the owning kernel team (campus-ai-os) and name the playbook in `playbook`."
+    },
+    "slug": { "type": "string" },
+    "playbook": { "type": "string" },
+    "generated_at": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}(:[0-9]{2}(\\.[0-9]+)?)?(Z|[+-][0-9]{2}:?[0-9]{2})$",
+      "$comment": "ISO 8601 with a zone. UTC `Z` preferred."
+    },
+    "external_ref": {
+      "$comment": "Run-level re-findable handle in the owner's systems (order id, post id, ticket…) or null. Any JSON type; the reader treats it as opaque."
+    },
+    "permission": { "type": "string", "enum": ["draft-only", "publish"] },
+    "completion": {
+      "type": "object",
+      "required": ["execution_success", "artifact_passed", "owner_approved"],
+      "properties": {
+        "execution_success": { "type": "boolean" },
+        "artifact_passed": { "type": "boolean" },
+        "owner_approved": { "type": "boolean" }
+      },
+      "$comment": "Run-level self-report, exactly three booleans (Foundry v1.1 spec 5.2). Relation to assets: execution_success = the run finished; artifact_passed = every asset passed its own done-check; owner_approved = the owner said yes. An asset-level `completion` never overrides these."
+    },
+    "assets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "status"],
+        "properties": {
+          "type": { "type": "string" },
+          "path": { "type": "string" },
+          "status": { "type": "string", "enum": ["draft", "published", "local", "scheduled", "sent", "skipped", "failed"] },
+          "tier": { "type": "string", "enum": ["native", "browser", "local"] },
+          "url": { "type": ["string", "null"] },
+          "external_ref": {},
+          "completion": { "type": "object" },
+          "performance": { "type": ["object", "null"] }
+        }
+      },
+      "$comment": "Interop v1 §3.1 asset ledger, unchanged for existing readers. May be empty (a run that produced nothing still reports completion). `skipped`/`failed` added in 1.1 because live ledgers already use them. `performance` is capability-gated and optional; absent is not failure."
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["stage", "employee", "employee_type"],
+        "properties": {
+          "stage": { "type": "string" },
+          "employee": { "type": "string" },
+          "employee_type": { "type": "string", "enum": ["kernel", "team", "playbook", "hire", "owner"] },
+          "version": { "type": "string" },
+          "reason": { "type": "string" },
+          "alternatives": { "type": "array", "items": { "type": "string" } },
+          "outcome": {}
+        }
+      },
+      "$comment": "R2 pull-forward (recipes-are-the-moat): who ran each stage, at what version, why, what else could have, and what came of it. Optional in 5.2.0; the Phase 3.4 producer→consumer fixture carries one; 5.3.0 dynamic staffing makes the resolver write it on every run."
+    },
+    "outcome": {
+      "$comment": "Run-level observed outcome once known (sales, replies, attendance…). Opaque to the envelope; outcome-reporter interprets it."
+    }
+  }
+}

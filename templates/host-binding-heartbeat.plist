@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Campus AI OS host-binding heartbeat (5.2.4, Seat Contract).
+  Re-issues .campus-os/host-binding.json from the host every 6 hours so a sandboxed
+  session of the primary client (Cowork) can resolve primary. TTL is 12 hours: one
+  missed beat survives, two go dark on purpose - if the Mac is off or the campus is
+  unmounted, the binding lapses and Cowork correctly drops to satellite.
+
+  Placeholders: {campus_root} = absolute campus path (the folder holding .campus-os/),
+                {client}      = the configured primary client (usually claude-cowork),
+                {home}        = the owner's home directory.
+  Install:  cp this file ~/Library/LaunchAgents/io.campus-os.host-binding-heartbeat.plist
+            launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/io.campus-os.host-binding-heartbeat.plist
+  Remove:   launchctl bootout gui/$(id -u)/io.campus-os.host-binding-heartbeat
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>io.campus-os.host-binding-heartbeat</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/usr/bin/python3</string>
+        <string>{campus_root}/.campus-os/resolve-seat.py</string>
+        <string>--issue-binding</string>
+        <string>--client</string>
+        <string>{client}</string>
+        <string>--ttl-hours</string>
+        <string>12</string>
+    </array>
+
+    <!-- Every 6 hours. -->
+    <key>StartInterval</key>
+    <integer>21600</integer>
+
+    <!-- Run at login/boot too, so a restart never leaves a gap. -->
+    <key>RunAtLoad</key>
+    <true/>
+
+    <key>StandardOutPath</key>
+    <string>{home}/Library/Logs/campus-os-host-binding.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>{home}/Library/Logs/campus-os-host-binding.err.log</string>
+
+    <key>Nice</key>
+    <integer>10</integer>
+    <key>ProcessType</key>
+    <string>Background</string>
+</dict>
+</plist>

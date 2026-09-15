@@ -1,0 +1,261 @@
+{
+  "campus_os_version": "5.2.9",
+  "updated": "2026-07-29",
+  "teams": [
+    {
+      "team": "dean",
+      "type": "kernel",
+      "role": "chief orchestrator",
+      "status": "active",
+      "version": "5.2.9",
+      "department": "dean",
+      "owns": "Chief orchestrator - routes work to the right team, runs playbooks, guards reversibility, keeps memory and the activity ledger.",
+      "triggers": [
+        "dean",
+        "what should I work on",
+        "route this",
+        "run the playbook"
+      ],
+      "done_check": "work routed to the correct owner; memory + ledger write-back at session end",
+      "results": "outputs/{YYYY-MM}/runs/dean/{slug}/results.json",
+      "permission": "draft-only"
+    },
+    {
+      "team": "campus-ai-os",
+      "type": "kernel",
+      "status": "active",
+      "version": "5.2.9",
+      "department": "dean",
+      "owns": "Campus platform - founding, upgrades, full and quick onboarding, health checks, first-win, dashboard, wiki memory, self-authoring loop, playbooks runtime, workforce governance.",
+      "triggers": [
+        "/campus-start",
+        "/full-onboarding",
+        "/update-workspace",
+        "/campus-doctor",
+        "/campus-first-win",
+        "/campus-map"
+      ],
+      "done_check": "campus-doctor validation passes (teams + playbooks presence and format)",
+      "results": "outputs/{YYYY-MM}/runs/campus-ai-os/{slug}/results.json",
+      "permission": "draft-only"
+    },
+    {
+      "team": "atlas",
+      "type": "kernel",
+      "role": "strategy and research",
+      "status": "active",
+      "version": "5.2.9",
+      "department": "dean",
+      "owns": "Strategy and research - the team you think with first and report to last. Runs the brainstorming council, researches and validates a topic, emits the brief every execution team reads, and reads back what shipped. Plans and learns; never publishes.",
+      "triggers": [
+        "/atlas-think",
+        "/atlas-scan",
+        "/atlas-daily",
+        "/atlas-validate",
+        "/atlas-competitor",
+        "/atlas-report",
+        "/atlas-grill",
+        "/atlas-status",
+        "/atlas-setup",
+        "brainstorm this",
+        "help me think this through",
+        "pressure-test this idea",
+        "should I make",
+        "what angle",
+        "grill me",
+        "what worked"
+      ],
+      "done_check": "one run_id threaded end to end; the council writes strategy-brief.md + mandate.json before any research, and a research run emits brief.json alongside brief.md - never only the markdown",
+      "results": "outputs/{YYYY-MM}/runs/atlas/{slug}/results.json",
+      "permission": "draft-only"
+    },
+    {
+      "team": "marketing",
+      "type": "department",
+      "department": "marketing",
+      "label": "Marketing",
+      "status": "active",
+      "owns": "Marketing department - content, social, email, and reach.",
+      "employees": [
+        "content-repurposer",
+        "email-sequence",
+        "social-planner"
+      ],
+      "permission": "draft-only"
+    },
+    {
+      "team": "sales",
+      "type": "department",
+      "department": "sales",
+      "label": "Sales",
+      "status": "active",
+      "owns": "Sales department - offers, launches, and revenue.",
+      "employees": [
+        "launch-planner",
+        "offer-builder"
+      ],
+      "permission": "draft-only"
+    },
+    {
+      "team": "lead-generation",
+      "type": "department",
+      "department": "lead-generation",
+      "label": "Lead Generation",
+      "status": "active",
+      "owns": "Lead Generation department - finding and qualifying the people Sales talks to: prospect research, list building, and cold outreach drafts.",
+      "employees": [],
+      "permission": "draft-only"
+    },
+    {
+      "team": "operations",
+      "type": "department",
+      "department": "operations",
+      "label": "Operations",
+      "status": "active",
+      "owns": "Operations department - the business's own running: procedures, scheduling, delivery, and document control.",
+      "employees": [],
+      "permission": "draft-only"
+    },
+    {
+      "team": "finance",
+      "type": "department",
+      "department": "finance",
+      "label": "Finance",
+      "status": "active",
+      "owns": "Finance department - money in and money owed: job costing, receivables follow-through, and cost visibility.",
+      "employees": [],
+      "permission": "draft-only"
+    },
+    {
+      "team": "people",
+      "type": "department",
+      "department": "people",
+      "label": "People",
+      "status": "active",
+      "owns": "People department - hiring, onboarding, and the humans on the team.",
+      "employees": [],
+      "permission": "draft-only"
+    },
+    {
+      "team": "community",
+      "type": "department",
+      "department": "community",
+      "label": "Community",
+      "status": "active",
+      "owns": "Community department - member and student engagement, care, and coaching prep.",
+      "employees": [
+        "client-comms",
+        "community-pulse",
+        "session-planner",
+        "student-comms"
+      ],
+      "permission": "draft-only"
+    },
+    {
+      "team": "education",
+      "type": "department",
+      "department": "education",
+      "label": "Teaching",
+      "status": "active",
+      "owns": "Education department - courses, lessons, class prep, and curriculum.",
+      "employees": [
+        "class-manager",
+        "course-builder",
+        "lesson-planner"
+      ],
+      "permission": "draft-only"
+    },
+    {
+      "team": "dean-office",
+      "type": "department",
+      "department": "dean-office",
+      "label": "Dean's office",
+      "status": "active",
+      "owns": "Dean's office - the chief of staff's own working staff: daily brief, weekly review, the wiki memory, and the strategy and research bench (brainstorming council, scans, competitor audits, briefs, and reading back what worked).",
+      "employees": [
+        "atlas-orchestrator",
+        "atlas-setup",
+        "competitor-analyzer",
+        "content-scanner",
+        "grill-me",
+        "morning-brief",
+        "outcome-reporter",
+        "strategy-council",
+        "weekly-review",
+        "wiki-ingest",
+        "wiki-query"
+      ],
+      "permission": "draft-only"
+    },
+    {
+      "team": "campus-systems",
+      "type": "systems",
+      "department": "kernel",
+      "label": "Campus systems",
+      "status": "active",
+      "owns": "Campus systems - the platform machinery (founding, upgrades, health, dashboard, self-authoring loop, workforce governance). Not employees; the campus running itself.",
+      "systems": [
+        "brief-builder",
+        "campus-doctor",
+        "campus-first-win",
+        "campus-map",
+        "campus-start",
+        "first-week",
+        "full-onboarding",
+        "hr-recruit",
+        "hr-registry",
+        "hr-review",
+        "hr-router",
+        "niche-config-builder",
+        "output-router",
+        "promote-skills",
+        "results-aggregator",
+        "review-candidates",
+        "scoring-engine",
+        "session-capture",
+        "skill-creator",
+        "update-workspace"
+      ],
+      "permission": "draft-only"
+    }
+  ],
+  "_notes": [
+    "Append-only by team plugins on first run; dedupe by team name.",
+    "Dean routes from this file. Add-on teams write their own entry here - never edit Dean's files.",
+    "permission: draft-only is the default for every team. The owner grants publish authority per team, here, explicitly."
+  ],
+  "playbooks": [
+    {
+      "playbook": "one-recording-to-a-week-of-content",
+      "version": "1.0.0",
+      "department": "marketing",
+      "owns": "Turn one recording/transcript/notes into a week of marketing - brief, core piece, announcement email, 3 social posts, community post. Draft-first.",
+      "triggers": [
+        "one recording to a week of content",
+        "turn this into a week of content",
+        "repurpose this into everything"
+      ],
+      "done_check": "5 drafts + results.json + one ledger line per generative stage",
+      "results": "outputs/{YYYY-MM}/runs/playbooks/one-recording-to-a-week-of-content/{run_id}/results.json",
+      "permission": "draft-only",
+      "stages": 6,
+      "recurring": false
+    },
+    {
+      "playbook": "weekly-reset",
+      "version": "1.0.0",
+      "department": "dean",
+      "owns": "The weekly reset - review last week, set this week's priorities mapped to goals, plan the week's social. Recurring, scheduled-task compatible, draft-first.",
+      "triggers": [
+        "weekly reset",
+        "run my weekly reset",
+        "set me up for the week"
+      ],
+      "done_check": "weekly review + priorities + social plan + results.json",
+      "results": "outputs/{YYYY-MM}/runs/playbooks/weekly-reset/{run_id}/results.json",
+      "permission": "draft-only",
+      "stages": 3,
+      "recurring": true
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  kernel:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Version lockstep
+        run: python3 tools/package.py --check-lockstep
+      - name: Contract current
+        run: python3 tools/build_contract.py --check
+      - name: Kernel fixtures
+        run: bash tests/run-tests.sh

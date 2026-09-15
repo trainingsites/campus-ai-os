@@ -1,0 +1,49 @@
+{
+  "name": "campus-ai-os",
+  "version": "5.2.9",
+  "description": "Campus AI OS - the complete starter campus. The kernel (chief of staff Dean, founding onboarding, campus doctor, dashboard, wiki memory, self-authoring skill loop) plus 4 scaffolded department managers and a full starter staff of AI employees (morning brief, weekly review, offer and course builders, email sequences, social planner, and more). Also a playbooks runtime that runs multi-step workflows end to end, built-in workforce governance, and optional per-stage model routing.",
+  "author": {
+    "name": "trainingsites.io",
+    "url": "https://trainingsites.io"
+  },
+  "homepage": "https://trainingsites.io/os",
+  "keywords": [
+    "campus-ai-os",
+    "kernel",
+    "orchestrator",
+    "onboarding",
+    "first-win",
+    "registry",
+    "education-business",
+    "agent-teams",
+    "self-authoring",
+    "wiki-query",
+    "campus-map",
+    "registration-block",
+    "playbooks",
+    "model-routing",
+    "workforce-governance",
+    "niche-packs"
+  ],
+  "interface": {
+    "displayName": "Campus AI OS",
+    "shortDescription": "Staff your education business with an AI team that remembers.",
+    "longDescription": "Campus AI OS turns a folder into a working campus: a chief of staff who knows your business, shared memory that compounds, four department managers, a starter staff of AI employees, playbooks that run multi-step work end to end, and health checks that tell you when something is off. File-based and portable - markdown and JSON, no vendor calls in the kernel.",
+    "developerName": "TrainingSites.io",
+    "category": "Productivity",
+    "capabilities": [
+      "Write",
+      "Planning",
+      "Memory",
+      "Automation"
+    ],
+    "websiteURL": "https://trainingsites.io/os",
+    "defaultPrompt": [
+      "Set up my campus.",
+      "Run a campus health check.",
+      "Turn one recording into a week of content."
+    ],
+    "brandColor": "#2563EB"
+  },
+  "skills": "./skills/"
+}

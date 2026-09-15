@@ -1,0 +1,344 @@
+{
+  "pack": "education",
+  "label": "Education",
+  "version": "5.2.9",
+  "identity": {
+    "business_noun": "education business",
+    "owner_line": "The owner is an educator who wears many hats: teacher, trainer, consultant, creator, community host.",
+    "customer_noun": "customer or student",
+    "founding_frame": "You're not installing software. You're setting up an AI-native education business - one person wearing many hats, backed by an AI staff that remembers everything and does real work. I'm your chief of staff: I run the office, route the work, and protect you from mistakes.",
+    "q1": "What's your education business? What do you teach, train, consult on, or create?",
+    "q1_pushback": "Say it the way you'd say it to someone about to pay you.",
+    "q2_examples": "courses, coaching, workshops, a membership, consulting, done-for-you work"
+  },
+  "departments": [
+    "community",
+    "education",
+    "marketing",
+    "sales",
+    "lead-generation"
+  ],
+  "managers": [
+    {
+      "id": "marketing",
+      "display_name": "Marketing",
+      "dept_dir": "departments/marketing/",
+      "reports_to": "dean",
+      "shape": "calendar",
+      "state_file": "departments/marketing/content-calendar.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "weekly-content-planning",
+          "cron": "0 17 * * 5",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "fills next week's open slots from research briefs; queues production jobs"
+        }
+      ],
+      "gates": {
+        "social": {
+          "mode": "draft",
+          "note": "Buyer sets grants during onboarding. Nothing auto-posts on a fresh install."
+        },
+        "email": {
+          "mode": "draft",
+          "note": "Campaign drafts only - sending to a real list is the owner's call."
+        },
+        "blog": {
+          "mode": "draft"
+        },
+        "community": {
+          "mode": "dark",
+          "note": "The community feed belongs to the Community desk. Media Desk queues, it does not post."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "A buyer has not heard their own voice come back yet. Their first live post should be one they approved."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/marketing/{run_id}/"
+      }
+    },
+    {
+      "id": "sales",
+      "display_name": "Sales",
+      "dept_dir": "departments/sales/",
+      "reports_to": "dean",
+      "shape": "pipeline",
+      "state_file": "departments/sales/pipeline.md",
+      "state_stale_after_days": 7,
+      "stages": [
+        "sourced",
+        "qualified",
+        "contacted",
+        "responded",
+        "in_conversation",
+        "proposed",
+        "won",
+        "lost",
+        "dormant"
+      ],
+      "stage_aging_alert_days": 14,
+      "cadence": [
+        {
+          "task": "weekly-pipeline-review",
+          "cron": "0 16 * * 5",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "ages every item, flags stalls past stage_aging_alert_days, surfaces the week's real next actions"
+        }
+      ],
+      "gates": {
+        "outreach_email": {
+          "mode": "draft",
+          "note": "Every outbound email is a draft the owner sends by hand. Nothing auto-sends to a human being."
+        },
+        "crm_write": {
+          "mode": "draft"
+        },
+        "proposal": {
+          "mode": "draft"
+        },
+        "pricing": {
+          "mode": "owner_batch_gate",
+          "note": "No cadence run may set, change, or discount a price."
+        },
+        "social": {
+          "mode": "dark",
+          "note": "Not this desk's surface."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Sales surfaces touch real people and real money. The draft-first floor is strictest here."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/sales/{run_id}/"
+      }
+    },
+    {
+      "id": "lead-generation",
+      "display_name": "Lead Generation",
+      "dept_dir": "departments/lead-generation/",
+      "reports_to": "dean",
+      "shape": "pipeline",
+      "state_file": "departments/lead-generation/prospect-list.md",
+      "state_stale_after_days": 7,
+      "stages": [
+        "sourced",
+        "researched",
+        "queued",
+        "contacted",
+        "replied",
+        "qualified",
+        "handed_to_sales",
+        "disqualified",
+        "dormant"
+      ],
+      "stage_aging_alert_days": 10,
+      "cadence": [
+        {
+          "task": "weekly-prospect-sweep",
+          "cron": "0 15 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "ages every prospect, refreshes the sourced list from the ICP, and surfaces who is ready to hand to Sales"
+        }
+      ],
+      "gates": {
+        "outreach_email": {
+          "mode": "draft",
+          "note": "Cold outreach is the strictest surface on the campus. Every message is a draft the owner sends by hand."
+        },
+        "list_building": {
+          "mode": "draft",
+          "note": "A prospect list is research, not contact. Building it is safe; using it is the owner's call."
+        },
+        "crm_write": {
+          "mode": "draft"
+        },
+        "social": {
+          "mode": "dark",
+          "note": "Not this desk's surface - Marketing owns social."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Lead Gen touches strangers. Nothing this desk produces reaches a human being without the owner sending it."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/lead-generation/{run_id}/"
+      }
+    },
+    {
+      "id": "community",
+      "display_name": "Community",
+      "dept_dir": "departments/community/",
+      "reports_to": "dean",
+      "shape": "roster",
+      "state_file": "departments/community/member-roster.md",
+      "state_stale_after_days": 5,
+      "cadence": [
+        {
+          "task": "community-pulse",
+          "cron": "0 8 * * *",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "updates who is active, who went quiet, who needs a human touch today"
+        }
+      ],
+      "gates": {
+        "community": {
+          "mode": "draft",
+          "note": "This desk owns the community surface, but a fresh install still drafts."
+        },
+        "email": {
+          "mode": "draft"
+        },
+        "social": {
+          "mode": "dark",
+          "note": "Media Desk owns social."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Posting to a member community in the owner's name is the last thing to automate, not the first."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/community/{run_id}/"
+      }
+    },
+    {
+      "id": "education",
+      "display_name": "Teaching",
+      "dept_dir": "departments/education/",
+      "reports_to": "dean",
+      "shape": "hybrid",
+      "state_file": "departments/education/class-schedule.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "class-scan",
+          "cron": "0 9 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "finds sessions needing prep, marketing, or post-session processing"
+        }
+      ],
+      "gates": {
+        "course_publish": {
+          "mode": "owner_batch_gate",
+          "note": "Lessons reach students. The owner reviews before anything goes live."
+        },
+        "email": {
+          "mode": "draft"
+        },
+        "community": {
+          "mode": "dark",
+          "note": "Community Desk owns the feed."
+        },
+        "social": {
+          "mode": "dark"
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Teaching material carries the owner's name and their students' trust."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/education/{run_id}/"
+      }
+    }
+  ],
+  "_managers_notes": [
+    "DEFAULTS ONLY. A local {dept}/manager.json OVERRIDES this entry wholesale. Pack declares, owner disposes.",
+    "Every cadence ships enabled:false. Founding does not switch on recurring spend the owner has not agreed to; /campus-doctor and the onboarding ladder offer them later.",
+    "Every gate ships draft or darker, and buyer_defaults.all_surfaces is 'draft' on all four - enforced as an ERROR by tools/lint_managers.py, not left to good intentions.",
+    "dept_dir and state_file assume the 'departments' filing structure because that is the founding default. A clients or projects campus has NO department folders and still has all four managers - the staff org is independent of how finished work is filed. campus-start resolves the real paths and writes them literally into the local manager.json.",
+    "Consumers ENUMERATE the managers that exist and read each contract. Never hardcode these four ids, never assume dept_dir == id + '/', and never derive state_file - it is a literal declared path. Deriving it would have broken the first campus this ran on, whose folders are named '{dept}-manager/'.",
+    "The shape enum is CLOSED: calendar | pipeline | roster | hybrid. Shapes describe HOW STATE MOVES, not what business the pack serves. A consulting pack can declare desks called Studio and Bench and reuse these four shapes unchanged. A fifth shape is a kernel change and a version bump."
+  ],
+  "wiki_taxonomy": [
+    {
+      "category": "clients",
+      "what": "One page per client, student, member, or partner. Their context, history, patterns, what has worked and what has not."
+    },
+    {
+      "category": "concepts",
+      "what": "The owner's methodology, frameworks, teaching concepts, business principles. Their IP \u2014 the thinking that defines their work."
+    },
+    {
+      "category": "offers",
+      "what": "One page per product, program, or service AS SOLD. Positioning, pricing history, what converted, how it evolved."
+    },
+    {
+      "category": "decisions",
+      "what": "Major business decisions and their rationale. Implications longer than 6 months \u2014 strategy calls, pivots, pricing changes."
+    },
+    {
+      "category": "market",
+      "what": "Competitor observations, market trends, audience insights, industry shifts, signals from other operators in the space."
+    },
+    {
+      "category": "operations",
+      "what": "Systems, tools, workflows, processes the business runs on. How things actually get done."
+    },
+    {
+      "category": "projects",
+      "what": "Multi-session initiatives with history \u2014 builds, plugins, launches, migrations. The WORK of making a thing, as distinct from the thing once it is sold."
+    },
+    {
+      "category": "outputs",
+      "what": "Significant one-time analyses worth preserving \u2014 research findings, audits, teardowns, validated data."
+    },
+    {
+      "category": "departments",
+      "what": "One rolling page per department. Purpose, active work, observed patterns. Updated in place, never duplicated."
+    }
+  ],
+  "_wiki_taxonomy_notes": [
+    "This list is FIXED at runtime. The agent picks one of these per page and never invents a category.",
+    "A niche with a different shape declares its own list here; the kernel has no taxonomy of its own beyond a fallback.",
+    "Precedence when two fit: decisions > concepts (the call, then the reusable framework it produced); offers > projects (once it is for sale, the offer page is canonical and the project page becomes build history); operations > projects (a standing system, not a one-time build)."
+  ],
+  "domain_skills": [
+    "class-manager",
+    "course-builder",
+    "lesson-planner",
+    "student-comms",
+    "session-planner",
+    "community-pulse"
+  ],
+  "_notes": [
+    "The active pack is the single home of niche identity. Kernel skills read these strings at runtime.",
+    "A new niche = a new packs/{niche}/ folder with this manifest + its domain skills. Zero kernel edits.",
+    "domain_skills must match skills/ folders carrying 'pack: education' frontmatter (build_niche.py --check enforces)."
+  ]
+}
