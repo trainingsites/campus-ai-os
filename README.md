@@ -1,12 +1,23 @@
+<p align="center">
+  <img src="docs/media/hero.png" alt="Campus AI OS — an AI staff that remembers your business" width="100%"/>
+</p>
+
+<p align="center">
+  <a href="https://github.com/trainingsites/campus-ai-os/releases/latest"><img src="https://img.shields.io/github/v/release/trainingsites/campus-ai-os?style=flat-square&color=0B4F6C" alt="Release"/></a>
+  <a href="https://github.com/trainingsites/campus-ai-os/actions/workflows/ci.yml"><img src="https://github.com/trainingsites/campus-ai-os/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-20BF55?style=flat-square" alt="License: MIT"/></a>
+  <img src="https://img.shields.io/badge/Claude-Desktop%20%C2%B7%20Cowork%20%C2%B7%20Code-0B4F6C?style=flat-square" alt="Claude compatible"/>
+  <img src="https://img.shields.io/badge/Codex-compatible-0B4F6C?style=flat-square" alt="Codex compatible"/>
+  <img src="https://img.shields.io/badge/kernel%20fixtures-226%20passing-20BF55?style=flat-square" alt="226 fixtures"/>
+</p>
+
+<p align="center">
+  <a href="#get-it-running">Install</a> · <a href="#see-it-work">See it work</a> · <a href="#how-it-is-built">How it is built</a> · <a href="#what-is-included">What is included</a> · <a href="CHANGELOG.md">Changelog</a> · <a href="SECURITY.md">Security</a> · <a href="https://trainingsites.io/os">Non-developer install</a>
+</p>
+
 # Campus AI OS
 
 **An AI staff that remembers your business. One folder. One chief of staff. A team you can use from Claude or Codex.**
-
-[![Release](https://img.shields.io/github/v/release/trainingsites/campus-ai-os)](https://github.com/trainingsites/campus-ai-os/releases)
-[![Tests](https://github.com/trainingsites/campus-ai-os/actions/workflows/ci.yml/badge.svg)](https://github.com/trainingsites/campus-ai-os/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/license-MIT-2563EB.svg)](LICENSE)
-![Claude](https://img.shields.io/badge/Claude-compatible-2563EB)
-![Codex](https://img.shields.io/badge/Codex-compatible-2563EB)
 
 Campus AI OS turns a folder into the operating system for your business. It gives you Dean, your AI chief of staff; shared memory that compounds; four departments; a starter team of AI employees; and playbooks that carry multi-step work from request to finished result.
 
@@ -14,7 +25,33 @@ It is free, open source, and MIT-licensed. Your business remains in files you ow
 
 > Not a developer? [Download Campus AI OS free at TrainingSites.io](https://trainingsites.io/os). It is the same release, with the simplest installation path.
 
----
+## See it work
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=-c77SUQNxwo"><img src="https://img.youtube.com/vi/-c77SUQNxwo/maxresdefault.jpg" alt="How Campus OS helps run my business — video walkthrough" width="720"/></a>
+  <br/>
+  <sub>▶️ <a href="https://www.youtube.com/watch?v=-c77SUQNxwo"><strong>How Campus OS helps run my business</strong></a> · a real week, not a demo reel</sub>
+</p>
+
+| The Campus Map | The doctor's report card |
+|---|---|
+| ![Campus Map of a fictional coaching campus: runs, deliverables, this week's focus, OKRs, and four departments](docs/media/campus-map-demo.png) | ![A real /campus-doctor run: version lockstep, registry, startup load, staff count, and two honest warnings](docs/media/campus-doctor-report-card.png) |
+| Every campus can render a private map of itself: what the team did, what it shipped, what this week is for. This one is a fictional campus built from the kernel's own fixtures. | `/campus-doctor` is a plain-English health check. Every line is backed by one evidence command, and it exits non-zero when anything is red. This is a real run on the maintainer's campus. |
+
+More walkthroughs: [My full agent setup on Campus OS](https://www.youtube.com/watch?v=6r-byjX-bCs) · [Live install, warts and all](https://www.youtube.com/watch?v=E5DpN7F4U1I)
+
+## How it is built
+
+<p align="center">
+  <img src="docs/media/four-layers.png" alt="Four layers: you the owner, Dean the chief of staff, four departments and their teams, and the files you own" width="100%"/>
+</p>
+
+- **You** say what you want done from whichever app is open. Nothing sends or publishes without your word.
+- **Dean** is the single orchestrator. It pulls only the context a job needs, routes to the owning department, runs the matching playbook, and records what happened.
+- **Departments and teams** are Community, Education, Marketing and Sales, each with a starter roster of AI employees and playbooks.
+- **Files you own** hold everything: identity, ICP, offers, goals, tasks, memory, wiki, a results envelope for every run, and an activity ledger the doctor can audit.
+
+One campus, one clock. Several clients can be primary on the same installation and finish work where they are; only the clock owner runs schedules and writes the shared ledger. See [PLATFORM.md](PLATFORM.md).
 
 ## Get it running
 
