@@ -34,9 +34,9 @@ Campus AI OS is built for exactly that owner. It is not a personal assistant for
 ## See it work
 
 <p align="center">
-  <a href="https://www.youtube.com/watch?v=-c77SUQNxwo"><img src="https://img.youtube.com/vi/-c77SUQNxwo/maxresdefault.jpg" alt="How Campus OS helps run my business — video walkthrough" width="720"/></a>
+  <a href="https://www.youtube.com/watch?v=fYT-l7i99R4"><img src="https://img.youtube.com/vi/-c77SUQNxwo/maxresdefault.jpg" alt="How Campus OS helps run my business — video walkthrough" width="720"/></a>
   <br/>
-  <sub>▶️ <a href="https://www.youtube.com/watch?v=-c77SUQNxwo"><strong>How Campus OS helps run my business</strong></a> · a real week, not a demo reel</sub>
+  <sub>▶️ <a href="https://www.youtube.com/watch?v=fYT-l7i99R4"><strong>How Campus OS helps run my business</strong></a> · a real week, not a demo reel</sub>
 </p>
 
 | The Campus Map | The doctor's report card |
