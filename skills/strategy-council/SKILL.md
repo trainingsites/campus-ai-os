@@ -6,7 +6,9 @@ description: >
   idea, or campaign from multiple voices, proposes alternatives, and converges to a
   sharpened angle with the dissent + a research mandate. Use for /atlas-think,
   "brainstorm this", "help me think this through", "should we make X", "is this a good
-  angle", "pressure-test this idea", "what angle".
+  angle", "pressure-test this idea", "what angle". A multi-turn session: for a quick
+  list of ideas ("give me ten subject lines", "brainstorm names") answer directly instead.
+  Only inside a campus (a folder with workspace.json); in any other chat, do not start it.
 version: 2.2.0
 department: dean-office
 ---

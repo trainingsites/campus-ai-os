@@ -211,6 +211,9 @@ def build():
                        "co_primary": "dean/.activity.{seat}.jsonl", "satellite": "dean/.activity.{seat}.jsonl",
                        "unknown": "dean/.activity.unknown.jsonl", "merge_glob": "dean/.activity.*.jsonl",
                        "unstamped_lines_belong_to": "primary",
+                       # SEC-05 (5.3.0): the resolver decides the ledger from `owns_clock`, never from role.
+                       # tools/contract.py + contract.mjs ledger_path() follow the same key; fail closed.
+                       "decided_by": "owns_clock",
                        "write_rule": "append only to the ledger resolve-seat.py returns; only the clock_owner client appends to the shared ledger"},
             "lane": {"satellite": "active-work/lanes/{seat}/", "proposals": "active-work/lanes/{seat}/proposals/"},
             "primary_owned_paths": primary_owned,
@@ -220,7 +223,7 @@ def build():
                 "schema_version": int(re.search(r"^HOST_BINDING_SCHEMA\s*=\s*(\d+)", seat_src, re.M).group(1)),
                 "ttl_hours_max": int(re.search(r"^HOST_BINDING_TTL_MAX_HOURS\s*=\s*(\d+)", seat_src, re.M).group(1)),
                 "via_values": literal_tuple(seat_src, "HOST_BINDING_VIA"),
-                "issue": "python3 .campus-os/resolve-seat.py --issue-binding --client <primary-client> [--ttl-hours N]",
+                "issue": "python3 -I -B .campus-os/resolve-seat.py --issue-binding --client <primary-client> [--ttl-hours N]",
                 "never_sync": True,
             },
             "rules": ["missing or invalid seat file => satellite, never primary",
@@ -228,6 +231,8 @@ def build():
                       "role grants writes; owns_clock grants recurring jobs and the shared ledger",
                       "a stamp that differs from today's primary is unresolved history, never a violation by itself",
                       "satellites write only their lane and their own ledger shard",
+                      "the ledger follows owns_clock, never role: a primary without owns_clock: true writes its own shard, never the shared ledger",
+                      "satellites never write shared outputs or primary-owned paths; they propose through their lane",
                       "a host binding is consulted only when the fingerprint is unavailable; it never overrides a mismatch",
                       "a session resolved via host-binding stamps \"via\": \"host-binding\" on every ledger line it writes"],
         },
@@ -315,7 +320,7 @@ def render_tables(c):
           f"| primary, not clock owner | `{c['seat']['ledger']['co_primary']}` | (whole campus) |",
           f"| satellite | `{c['seat']['ledger']['satellite']}` | `{c['seat']['lane']['satellite']}` |",
           f"| unknown seat | `{c['seat']['ledger']['unknown']}` | `{c['seat']['lane']['satellite']}` |", "",
-          f"Write rule: {c['seat']['ledger']['write_rule']}.", "",
+          f"Write rule: {c['seat']['ledger']['write_rule']}. Decided by `{c['seat']['ledger'].get('decided_by', 'owns_clock')}` as `tools/resolve-seat.py` returns it, never by role.", "",
           "Primary-owned paths: " + ", ".join("`" + p + "`" for p in c["seat"]["primary_owned_paths"]) + ".", "",
           "## run_id (owner: tools/mint_run_id.py)", "", f"Write: `{c['run_id']['canonical_write']}`. Run dir: `{c['run_id']['run_dir']['campus']}`.", "",
           "| Shape | Regex |", "|---|---|"]

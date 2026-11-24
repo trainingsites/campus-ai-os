@@ -13,7 +13,7 @@ import unittest
 
 KERNEL = Path(os.environ.get('KERNEL_SRC', Path(__file__).resolve().parent.parent)).resolve()
 ORDER = ('workspace', 'version_lockstep', 'kernel_kit', 'registry', 'context_weight', 'results_ledgers',
-         'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'context_files', 'stale_work', 'ledger')
+         'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'context_files', 'stale_work', 'ledger', 'runtime_drift')
 
 
 class EvidenceFixture(unittest.TestCase):

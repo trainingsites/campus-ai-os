@@ -101,7 +101,7 @@ founding name (or the canonical name where there is no founding name).
 `AGENTS.override.md` or `CODEX.md`) either at the root or in `dean/`. Find it by
 walking up from the working folder; if nothing above is a campus, accept exactly one campus among its children
 (one level down, real folders only, hidden folders and links skipped). Hosts often open the folder above the
-campus (Cowork mounting `TrainingSites/` for `TrainingSites/Claude-Cowork/`). Two or more child campuses:
+campus (Cowork mounting `MyBusiness/` for `MyBusiness/Campus/`). Two or more child campuses:
 never pick one - list them and ask the owner, then use that folder. Never test for a fixed folder name such as
 `Claude-Cowork/`, and never for one entry-file name alone: the owner names the
 folder, and the entry file differs per host. `python3 -I -B {kernel}/tools/resolve_context.py

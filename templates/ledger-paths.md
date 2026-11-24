@@ -23,7 +23,7 @@ Resolve `LEDGER_CANON` in this order, first hit wins:
 
 ## Resolving your seat
 
-Run `python3 {campus_root}/.campus-os/resolve-seat.py --client <actual-client>` once at startup, using the client identified by the host: `claude-cowork`, `claude-code`, or `codex`. Use the returned `seat`, `role`, `owns_clock`, `ledger`, `lane`, and `via`. Do not select a client to obtain a desired role. The resolver checks a stable machine fingerprint against the explicit client assignment; `mounted_at`, home-directory names, and model names never establish identity. Top-level `seat`/`role` in seat.json describe the primary owner for legacy metadata, not every caller.
+Run `python3 -I -B {campus_root}/.campus-os/resolve-seat.py --client <actual-client>` once at startup, using the client identified by the host: `claude-cowork`, `claude-code`, or `codex`. Use the returned `seat`, `role`, `owns_clock`, `ledger`, `lane`, and `via`. Do not select a client to obtain a desired role. The resolver checks a stable machine fingerprint against the explicit client assignment; `mounted_at`, home-directory names, and model names never establish identity. Top-level `seat`/`role` in seat.json describe the primary owner for legacy metadata, not every caller.
 
 If the resolver reports a warning, exits 2, or cannot run, visibly report the identity failure and operate as an unassigned satellite; never silently assume primary. If the host cannot expose its machine identity (for example a sandboxed Cowork container), primary access requires a verified host-side binding: `.campus-os/host-binding.json`, issued only where the fingerprint is observed by `resolve-seat.py --issue-binding --client <primary-client>`, short-lived (default 12 hours, never more than 24), and consulted only when the fingerprint is unavailable. A binding never overrides a fingerprint mismatch; do not substitute the configured fingerprint as if it were observed. No directory-path fallback is allowed.
 
@@ -42,6 +42,18 @@ file. Every line you write carries `"seat"`:
 
 `seat` is the field this canon requires. A session the resolver returned with `"via": "host-binding"` also writes `"via":"host-binding"` on every line, so audit can tell bound sessions from observed ones. Everything else in the line is
 unchanged from the shape kernel readers have always parsed.
+
+## The line shape — one shape for every run (log.activity standard, 5.3.0)
+
+Registered skill runs, playbook stages, scheduled jobs and ad-hoc turns all write ONE line shape: `schemas/ledger-line.schema.json` in the plugin. Required on write: `ts`, `seat`, `skill`, `dept`, `outcome`; everything else in the schema is optional, and extra keys are allowed.
+
+An ad-hoc turn (no matching skill) writes `"skill":"ad-hoc"` and logs ONLY when it produced an output, a write or a decision; pure conversation does not log. Add `"logged_for":"output"`, `"write"` or `"decision"` to say which.
+
+A registered skill or playbook run may add `skill_version`: the `version` in that skill's frontmatter, read from the file, never typed from memory; optional, and absent on older lines.
+
+Reserved optional keys, filled by the 5.3.1 routing adapter and never invented before then: `provider`, `model`, `tokens_in`, `tokens_out` (integers) and `cost` (USD number), beside the existing `tier_requested` / `tier_used`. Absent means not measured, never zero.
+
+Check a line before or after writing it: `python3 tools/validate_ledger.py --line '{...}' --write`. Reading is permissive: lines written before this shape (no `seat`, `timestamp` instead of `ts`) stay valid as legacy; only a present key with the wrong type fails. `/campus-doctor` reports mis-typed lines and never rewrites one.
 
 ## The read rule — permissive
 

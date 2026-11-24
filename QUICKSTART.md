@@ -6,9 +6,17 @@ real work in about 10 minutes - a founding, not a form. Your installed version i
 
 ## Install (once)
 
-1. Add this plugin in Claude (Settings -> Plugins -> install from file).
-2. Create an empty folder for your campus and connect it in your Claude session.
+1. Add this plugin. In **Claude Code** (recommended), from an empty folder:
+   `/plugin marketplace add trainingsites/campus-ai-os`, then
+   `/plugin install campus-ai-os@campus-ai-os`. In the **Claude desktop app**, open its
+   plugin settings and upload the downloaded `.plugin` file. In **Codex**, follow
+   `CODEX-INSTALL.md`.
+2. Create an empty folder for your campus and open it (or connect it) in your session.
 3. Say: **/campus-start**
+
+**Claude Code will ask before it runs a command.** Setup, updates and the health check run small
+checks that ship inside this plugin. Approve them as they come, or set the permission mode to
+allow edits and commands for this session so setup runs without stopping.
 
 ## What happens next
 
@@ -53,6 +61,21 @@ before changing anything, and reminds you to back up first.
 Already on v3.0, v3.1, or v3.2? Say **/update-workspace** - the upgrade is
 additive-only, and it can bring your department managers up to current
 conventions with a per-manager preview you approve.
+
+## Updating a campus you already use
+
+1. Check that a backup includes your campus folder.
+2. Replace the installed plugin with the new one. Use the same edition your campus was set up
+   with; a different edition belongs in a new empty folder.
+3. Open the campus folder you already use and say **update my campus**.
+4. Read the list of changes it shows, then say **go**. It asks which AI apps you use with this
+   folder; name the main one.
+5. Say **/campus-doctor** to check the result.
+
+Changed your mind? Say **undo the last update**, before you swap or remove the plugin. The
+system files go back to how they were, anything the update added is moved into a folder under
+`dean/archive/`, and nothing is deleted. Your own notes, tasks and work diary are never touched. Scheduled jobs and connected accounts belong to the app you set them up in; set them
+up again if you moved to a different app.
 
 Add-on teams you already own keep working; "legacy" entries in the team
 directory adopt the new registration block whenever they next update.

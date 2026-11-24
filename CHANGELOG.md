@@ -4,6 +4,153 @@ All notable changes to the Campus AI OS kernel. Format follows Keep a Changelog;
 
 ## [Unreleased]
 
+## [5.3.8] - 2026-11-23
+
+5.3.7 was packaged but never released.
+
+Two update runs of 5.3.6 on older campuses, one of them over a campus founded with another edition, and the first real run of 5.3.7 from an empty folder.
+
+### Fixed
+
+- **One wrong answer could rename a campus for another edition.** When the department names do not match the plugin's edition and the owner says the campus was set up with this edition anyway, the update now shows every rename and asks once more. Only the typed word RENAME carries on.
+- **The org-chart tool wrote when asked for its options.** `tools/gen_department_entries.py` run bare, with `--help` or with an unknown option rewrote the plugin's own registry template. Every write now needs an explicit mode; anything else prints the usage and writes nothing. An unknown pack name is refused, and a campus that records no edition is not renamed without `--confirm-rename RENAME`.
+- **The different-edition message no longer names a version** of the other edition.
+- **Dean's instructions named the Education pack in every edition.** The entry-file templates now point at `packs/active.json` instead of naming one pack.
+- **Job cards are named, never counted.** The Chief of Staff calls a card by its name and never says how many there are; they are the owner's default job cards, a starting set.
+
+### Added
+
+- **Quickstart: permission prompts and updating.** One paragraph on why Claude Code asks before running the plugin's checks, and the steps to update a campus already in use.
+- **Undo for an update.** `tools/update_undo.py` takes a snapshot before the first write and a seal after the last. On "undo the last update" it shows what it would do, then puts the system files back and moves what the update created into the snapshot folder. Nothing is deleted. It never restores over the owner's job cards, seat file, memory, task list or work diaries, flags any entry file that changed after the update, and works whichever edition is installed.
+
+## [5.3.7] - 2026-11-23
+
+5.3.6 was packaged but never released.
+
+First real run of 5.3.6 from an empty folder, start to finish.
+
+### Fixed
+- **Setup no longer leaves a temp file behind.** Writing the seat file for the first time made a temporary file and then removed it; an app that may create files but not remove them left `.seat.json.<letters>.tmp` in `.campus-os/`. The first write now creates the file directly.
+- **The three setup options are always shown,** including when the owner hands over their answers in a file. The choice is taken from the file only after the options are on screen.
+
+### Changed
+- **A pack's job cards file may end with playbooks:** named sets of cards that run together, in order. The chief of staff looks for a named playbook there before the registry's playbooks, and the first win never starts from the playbooks section. The chief of staff now reads the cards once a session, the first time work is asked for, and does any job a card covers by that card's rules; in 5.3.6 it opened the file only when a card was named, so a plainly worded request skipped the card. Nothing on the cards starts by itself.
+
+## [5.3.6] - 2026-11-23 (packaged, not released)
+
+Fixes from an independent review of the 5.3.5 cut, made before either was released. 5.3.5 was packaged but never released; its notes below still describe the release, with these corrections.
+
+### Fixed
+- **The edition check runs before anything is copied.** It now comes first in `/update-workspace`, ahead of the kit copy, and the roster tool refuses in code to relabel a campus recorded as another edition. `/wiki-ingest`, `/wiki-query` and the first win also read the campus's edition, so the wiki categories no longer switch outside an update.
+- **A campus with no recorded edition is recognised by its department names,** never assumed from its version; when they differ the owner is asked once.
+- **The seat step asks which app is the main one** when the owner names more than one, so running the update from a second app can't take the schedules away from the first. It also covers the Windows command name, the host-binding note, lowercase app names, and a named app's entry file on any update.
+- The older-campus entry points end with items 11-18 (one line still said 11-15).
+
+## [5.3.5] - 2026-11-23 (packaged, not released)
+
+5.3.4 was packaged but never released.
+
+Two owner field reports: a Windows campus with a second AI app, and a coach build put on top of an education campus.
+
+### Added
+- **The campus records its edition.** Founding writes `pack` into `workspace.json`, read from the plugin, and an older campus gets the key on its first update.
+- **Antigravity is a named app.** The founding question offers it as an example, founding installs its entry files (`AGENTS.md` and `GEMINI.md`) when the owner names it, and both adapters tell it to resolve under its own name (`--client antigravity`), so it starts proposal-only like any other second app.
+
+- **Job cards.** A pack can ship `job-cards.md`: one card per job the owner hands over, with what it needs, its rules, what done looks like and where the result lands. Founding copies it to `dean/job-cards.md`, the first win is the first card, and the chief of staff reads a card only when that job is asked for. The copy belongs to the owner; no update overwrites it. A pack without cards behaves as before.
+
+### Fixed
+- **An update no longer switches a campus to another edition without saying so.** `/update-workspace` compares the campus's edition with the installed plugin's before it writes anything. When they differ it stops, changes nothing, and tells the owner the two ways forward: reinstall the edition the campus was founded with, or start the new edition in an empty folder. Before this, a coach build installed over an education campus relabelled its departments and changed its wiki categories with no warning.
+- **An update writes the seat file when a campus has none.** A campus founded before 5.3.0 had no `.campus-os/seat.json`, so every app resolved as unassigned even after the Windows and Linux fix in 5.3.0. The update now asks which apps work in the folder and writes the file; an existing seat file is never rewritten.
+
+### Changed
+- **Coach pack: owner-visible wording says "department" and "campus".** Seventeen phrases in `packs/coach/pack.json` (rule notes, one default rationale, one memory category) said "desk" or "office"; cross-department rules now name the coach department (Client Care, Content & Visibility). Wording only: no rule, level, stage or schedule changed.
+
+## [5.3.4] - 2026-11-12
+
+5.3.3 was packaged but never released. Windows field report (a campus on Windows 11, Python 3.14, PowerShell 5.1).
+
+### Fixed
+- **A broken Python reads as a broken Python, not a broken campus.** `/campus-doctor` checks once that Python can start in isolated mode before it runs its sub-checks. When it cannot (a damaged install; on Windows it shows as `Failed to import encodings`), the report says so in one line and marks the checks it could not run as not checked, instead of three red campus errors.
+- **A byte-order mark no longer stops the doctor.** Windows PowerShell 5.1 puts one in front of text it pipes to a program. The kit manifest and the schedule list are now read with or without it, piped or from a file (`doctor_evidence.py`, `kernel_kit.py`, `check_cron_parity.py`).
+
+### Changed
+- The doctor skill and the Kernel preamble say what to type on Windows (`python` or `py -3`) and to pass the manifest as a file path when the shell cannot pipe it.
+
+## [5.3.3] - 2026-11-10
+
+### Fixed
+- The pack assembler regenerates a niche build's contract and kit manifest after it edits the build, so the build passes its own packaging gate. Found cutting the first coach build; 5.3.2 was packaged but never released.
+
+## [5.3.2] - 2026-11-10 (packaged, not released)
+
+First coach build. Assembling the coach pack showed that a niche build could keep commands and staff entries for skills it does not ship. 5.3.1 was packaged but never released.
+
+### Fixed
+- **A niche build ships nothing that points at a missing skill.** The pack assembler drops a command that names a dropped skill even when the file is named differently (`/plan-lesson` went with `lesson-planner`), filters department rosters down to the skills the build ships, and refuses to finish if a command or roster still names a dropped skill.
+- The plugin listing in a niche build names that pack's business (a coach build says "coaching practice", not "education business").
+- `/first-week`, `/campus-first-win` and the launch planner skip a step whose employee the campus does not have, instead of sending the owner to a skill that is not there.
+
+### Builds
+- `campus-ai-os` (education, the default) and a separate coach build assembled from `packs/coach`.
+
+## [5.3.1] - 2026-11-10 (packaged, not released)
+
+Fixes from an independent review of the 5.3.0 cut, made before either was published. 5.3.0 was packaged but never released; its notes below still describe the release, with these corrections.
+
+### Security
+- **Cloud and sandboxed sessions keep the host binding.** Inside a container (Docker, Podman, Kubernetes and similar, or a `container` environment variable) the resolver observes no Linux fingerprint, as on 5.2. In 5.3.0 a sandbox read its own throwaway machine id, so a valid host binding was denied, and `--init-seat` could bind `seat.json` to the container.
+- **Seat and host-binding files are written without following links.** A random temporary name, no write through a link at the file or its folder, and `--init-seat` can no longer overwrite a `seat.json` that appears mid-write.
+- **Work Orders can't be forged or moved by a satellite.** `wo.py event --field` cannot set the seat, time, event or any key the tool writes. An event counts only from the log of the seat it names; signing, starting, claiming, deciding, changing, verifying, stopping and closing count only from a primary seat. A satellite's new Work Order is saved as a proposal in its own lane. `wo.py status` says how many lines it did not count.
+- **Work Order paths stay inside the campus.** `--dir` and the department can't escape the campus or pass through a link, and the ledger append never follows a link.
+- **Every documented resolver call runs isolated** (`python3 -I -B`), so a planted module beside the resolver never loads.
+
+### Fixed
+- The kernel kit carries `schemas/ledger-line.schema.json`, so the doctor's ledger section and the writer self-check work from the kit.
+- The ledger line shape accepts what the resolver writes (`via: unresolved`, null `run_id` and tier). An older `via` word reads as legacy, never as a failure; new lines are still checked strictly.
+- `wo.py`: titles with backslashes or quotes are inserted safely, multi-line values are refused, files are read and written as UTF-8 and output is plain ASCII (Windows), and archive folders are skipped on every platform.
+- Founding path C and `/import-ai-memory` check the seat before writing shared files (a satellite proposes in its lane), say accurately that files are read in the chat and sent nowhere else, and the brain's rule 1 names their one exception: creating a new file in `inputs/intake/`.
+
+## [5.3.0] - 2026-11-10 (packaged, not released)
+
+Security work carried from the 5.3 train, the fixes from a customer's first-install field report (2026-11-09), GitHub issue #2, and two tools proven on the maintainer's own campus. WO-2026-09-30-10.
+
+### Security
+- **SEC-05: write rights come from the seat resolver, never from a file's defaults.** The shared activity ledger follows `owns_clock`, never role: the contract's `ledger_path()` (Python and JS) fails closed, the generated contract states the rule, and the Codex and Gemini adapters give a satellite only its own lane and ledger shard. No kernel writer names the shared ledger by literal path. Gate: `tests/test_sec05_adapter_lanes.py` runs the real resolver for a clock-owner primary, a non-clock primary and a satellite.
+- **A second AI app starts proposal-only.** Founding now asks which AI apps will work with the campus and writes `.campus-os/seat.json` from the answer: the founding app is primary and runs the schedules; every other app is a satellite until the owner promotes it. Before this, founding wrote no seat file, so every app on a new campus resolved as an unassigned satellite.
+- New kit tools follow the 5.2.15 rule (sibling imports at the end of the path, no bytecode written into the kit).
+
+### Added
+- **Seat fingerprint on Windows and Linux (GitHub issue #2).** `resolve-seat.py` reads Windows `MachineGuid` and Linux `/etc/machine-id`; the macOS value is unchanged, so existing seat files keep matching. New owner mode `--init-seat --primary <app> [--satellite <app>] [--clock-owner <app>]` writes `seat.json` once and never overwrites one.
+- **Founding path C, "start from what you already have".** `/campus-intake` reads the owner's documents, links and AI memory, writes context files as SEEDED, plays them back, then asks only about the gaps. `/import-ai-memory` gets what ChatGPT or Claude already knows about the owner. Neither sends anything anywhere on its own; files are read in the chat like anything else the owner shares.
+- **Work Orders.** `tools/wo.py` plus `templates/work-orders/`: a non-routine build gets a Work Order (job, done means, budget, permissions, stop rules) and its status is computed from events in each seat's own ledger. Departments come from the campus registry. In the kernel kit, so it runs from `.campus-os/kernel/tools/wo.py`.
+- **Challenge-First rule** (rule 5 in the chief-of-staff brain): push back once before a price change, a new offer, a new build or anything hard to undo.
+- **Coach pack** (`packs/coach/`): the Professional Coach niche manifest, conformant and assemblable. The education pack stays the default.
+- **One ledger line shape** for registered and ad-hoc runs: `schemas/ledger-line.schema.json` and `tools/validate_ledger.py` (read-permissive, `--write` strict). Ad-hoc turns log only on an output, a write or a decision. Optional keys reserved for model routing: `provider`, `model`, `tokens_in`, `tokens_out`, `cost`; optional `skill_version`.
+- **/campus-doctor** gains a fourteenth section, `runtime_drift` (`tools/check_runtime_drift.py`): each runtime copy of a scheduled job is compared with its `scheduled/` file and drift is reported, never fixed. The ledger section reports mis-typed lines.
+- PURPOSE line on kernel playbooks and on promoted skills.
+- `/campus-first-win` also offers the active pack's own domain skills.
+
+### Changed
+- The task-board tool (`generate_task_index.py`) is copied at founding (kit core), and the task spec's commands point at the path that exists in a campus.
+- Install docs lead with Claude Code (`/plugin marketplace add trainingsites/campus-ai-os`) and no longer name a fixed desktop-app menu path. `SECURITY.md` says where the release hash record lives and how to check it on macOS, Linux and Windows. `CODEX-INSTALL.md` explains seats for Codex and Claude on one campus.
+- Narrower triggers: the morning brief alone answers "what should I work on"; the strategy council is for real pressure-tests, not a quick idea list, and only inside a campus; the kernel's skill builder says it builds campus skills.
+- The chief-of-staff brain's rule 3 is now "One-Page Plan Rule (a Work Order)"; `/update-workspace` inserts the Work Order line and the Challenge-First rule into existing brains.
+
+### Fixed
+- `QUICKSTART.md` was headed "v4.1"; root-doc titles are version-neutral, and README and QUICKSTART name the business through the active pack.
+- `dean-CODEX.md`'s ledger example used "team" for the dept field.
+- Removed the maintainer's own folder names and a machine path from buyer-facing docs.
+
+### Upgrade notes
+- `/update-workspace` refreshes the kernel kit (it now carries `wo.py` and the Work Order templates) and inserts the two brain rules.
+- A campus with no `seat.json`: run once in a terminal in the campus folder, naming the app that runs schedules: `python3 -I -B .campus-os/resolve-seat.py --init-seat --primary claude-code`. Add `--satellite codex` if Codex also works there.
+- Using Codex on an older campus: copy the plugin's `templates/clients/AGENTS.md` to the campus root again so it carries the resolver-driven lane rules.
+
+### Install compatibility
+- **Claude (Claude Code, Claude desktop app):** no manifest change and no new install step.
+- **Codex:** the `.codex-plugin` manifest is regenerated from the Claude one; the adapter text changed (see Upgrade notes).
+- **Gemini:** the adapter follows the same resolver rules; Gemini support is still not claimed.
+
 ## [5.2.18] - 2026-10-22
 
 Repairs the four findings of the Codex audit of the public 5.2.17 repository and release (`outputs/2026-10/reports/2026-10-22-campus-ai-os-github-audit.md`, WO-2026-10-22-04; WO-2026-10-20-06).

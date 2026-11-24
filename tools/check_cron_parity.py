@@ -396,8 +396,9 @@ def main() -> int:
         return exit_code
 
     try:
-        raw = Path(args.live).read_text(encoding="utf-8") if args.live else (
-            sys.stdin.read() if not sys.stdin.isatty() else "")
+        # utf-8-sig: Windows PowerShell 5.1 and Notepad put a byte-order mark in front of the text (5.3.7)
+        raw = Path(args.live).read_text(encoding="utf-8-sig") if args.live else (
+            sys.stdin.buffer.read().decode("utf-8-sig") if not sys.stdin.isatty() else "")
         if not raw.strip():
             return early("unknown", "SCHEDULER_UNKNOWN", "No retrieval evidence supplied", 2)
         payload = json.loads(raw)

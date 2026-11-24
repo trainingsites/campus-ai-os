@@ -52,9 +52,15 @@ CORE = (
     "tools/validate_results.py",
     "tools/validate_registry.py",
     "tools/materialize_registration_spec.py",
+    "tools/generate_task_index.py",
+    "tools/wo.py",
     "contracts/campus.json",
     "schemas/results.schema.json",
     "templates/registration-block-spec.md",
+    "templates/work-orders/quick.md",
+    "templates/work-orders/full.md",
+    "templates/work-orders/standing.md",
+    "templates/work-orders/events.md",
 )
 # Copied the first time a skill needs them on a kernel version (campus-doctor, update-workspace).
 ON_DEMAND = (
@@ -64,7 +70,9 @@ ON_DEMAND = (
     "tools/context-weight.mjs",
     "tools/context-prune.mjs",
     "tools/prune-write.mjs",
-    "tools/generate_task_index.py",
+    "tools/validate_ledger.py",
+    "tools/check_runtime_drift.py",
+    "schemas/ledger-line.schema.json",
     "templates/context-files.md",
 )
 # The installed manifest travels with the kit so doctor_evidence can read the kit's version.
@@ -74,6 +82,7 @@ MANIFEST_CANDIDATES = (".claude-plugin/plugin.json", ".codex-plugin/plugin.json"
 PLUGIN_ONLY = {
     "tools/gen_department_entries.py": "reads packs/ (the whole niche pack)",
     "tools/resolve-seat.py": "has its own campus copy, .campus-os/resolve-seat.py (5.2.4)",
+    "tools/update_undo.py": "its snapshot runs before the kit is copied (5.3.8)",
 }
 # Build and release tools; never run against an owner's campus.
 MAINTAINER_ONLY = (
@@ -81,6 +90,15 @@ MAINTAINER_ONLY = (
     "tools/contract.mjs", "tools/lint_managers.py",
 )
 TIERS = {"core": CORE, "on_demand": ON_DEMAND}
+
+
+def read_input(source: str) -> str:
+    """Text from a file path, or from stdin when source is '-'. A leading byte-order mark is
+    dropped: Windows PowerShell 5.1 adds one when it pipes text to a program, and Notepad can
+    save one, and json.loads refuses it (5.3.7)."""
+    if source == "-":
+        return sys.stdin.buffer.read().decode("utf-8-sig")
+    return Path(source).read_text(encoding="utf-8-sig")
 
 
 def sha256(path: Path) -> str:
@@ -349,8 +367,7 @@ def main(argv=None) -> int:
         if args.command == "check":
             manifest = None
             if args.manifest:
-                raw = sys.stdin.read() if args.manifest == "-" else Path(args.manifest).read_text(encoding="utf-8")
-                manifest = json.loads(raw)
+                manifest = json.loads(read_input(args.manifest))
             result = check(Path(args.campus_root).resolve(), args.installed_version, args.tier, manifest)
             if args.json:
                 print(json.dumps(result, indent=2))

@@ -56,7 +56,7 @@ Log completion.
 
 ## Day 4: The People You Serve
 
-**Theme:** Exercise the employees who work with your clients, students or members. Find them in `.campus-os/registry.json`: the department rosters that hold `client-comms`, `student-comms`, `session-planner` and `class-manager`. Name each department by its registry label (kernel preamble §2). Ask one question first: "Who do you work with most: clients, students, or coaching members?" Then:
+**Theme:** Exercise the employees who work with your clients, students or members. Find them in `.campus-os/registry.json`: the department rosters that hold `client-comms`, `student-comms`, `session-planner` and `class-manager`. Name each department by its registry label (kernel preamble §2). Ask one question first: "Who do you work with most: clients, students, or coaching members?" Then run the steps below, skipping any whose employee this campus does not have (it is not in the registry) and saying so in one line:
 
 **Clients:**
 1. Pick a client (real or example)

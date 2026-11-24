@@ -91,9 +91,12 @@ trigger_examples:
   - "{example 2}"
   - "{example 3}"
 tool_signature: ["{tool 1}", "{tool 2}"]
+purpose: "{one line: the repeated workflow this captures, from {cluster size} ledger lines dated {first}..{last}}"
 ---
 
 # {slug}
+
+**PURPOSE:** {the same one line - why this skill exists and the ledger evidence that motivated it}
 
 {Draft SKILL.md body from skill-creator sub-call}
 ```

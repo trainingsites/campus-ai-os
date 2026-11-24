@@ -10,6 +10,7 @@ and the history behind each one, keyed by the section name in the JSON.
 ```
 python3 -I -B .campus-os/kernel/tools/doctor_evidence.py --campus-root {campus_root} --json
        [--kit-manifest PATH|-] [--installed-version X.Y.Z] [--today YYYY-MM-DD] [--window N] [--scheduled-json PATH|-] [--sweep]
+       [--runtime-dir PATH ...]
 ```
 
 - `--today` pins the as-of date (default: today, UTC). Same campus + same
@@ -26,7 +27,8 @@ python3 -I -B .campus-os/kernel/tools/doctor_evidence.py --campus-root {campus_r
   whenever the tool runs from the campus kit: the kit's own stamp and manifest
   copy say what the KIT claims, not what the plugin is. It also supplies the
   installed version; `--installed-version` overrides that.
-- JSON shape: `generated.today` plus thirteen sections, each
+- `--runtime-dir PATH` (repeatable) names a folder where this host keeps its runtime job copies (`{taskId}/SKILL.md`); relative paths are campus-relative. Without it `runtime_drift` is skipped.
+- JSON shape: `generated.today` plus fourteen sections, each
   `{status, detail, line}`. Statuses: `ok`, `opportunity`, `needs-decision`,
   `skipped`, `error`. Without `--json` the tool prints each section's `line`
   in check order - the same lines the report shows.
@@ -34,6 +36,15 @@ python3 -I -B .campus-os/kernel/tools/doctor_evidence.py --campus-root {campus_r
   is `error` - evidence collected, some lines red; report them. Exit `2` or
   no JSON: the tool failed (usage, or the contract could not load). Only the
   last case is a tool fault.
+- `preflight` appears only when this computer's Python cannot start with
+  `-I` (a broken install; seen on Windows as `Failed to import encodings`).
+  It is one `error` line naming the computer, not the campus; `detail.blocked`
+  lists the sections that could not run their sub-tool, and each of those is
+  `skipped` with reason `python-isolated-unavailable`. Exit is `1`. Without
+  `--json` its line prints first.
+- Text input (`--kit-manifest`, `--scheduled-json`, as a path or on stdin)
+  may start with a UTF-8 byte-order mark; Windows PowerShell 5.1 adds one
+  when it pipes text.
 - Every sub-tool failure lands in its own section as `error` with the
   sub-tool's `stderr_tail`; the other sections still emit. Report the failing
   section as a tool problem for that one line, not as a campus fault.
@@ -49,6 +60,7 @@ python3 -I -B .campus-os/kernel/tools/doctor_evidence.py --campus-root {campus_r
 | `stale_work` | 5 | | |
 | `results_ledgers` | new (Phase 3.1) | `ledger` | 9 |
 | `schedules` | 10 | manual (see `manual-checks.md`) | 1 write test, 2b, 4, 6a, 6b, 8, 8a-i, 8b, backup line |
+| `runtime_drift` | new (5.3.0) | | |
 
 Other kernel files still cite the old numbers (tools comments, PLATFORM.md,
 update-workspace). They mean the row above.
@@ -235,6 +247,8 @@ files alone (no git, no host API).
   a valid PRIMARY seat proves clean ownership. `missing` -> `[--] Seat
   identity not declared - ownership can't be verified. Fine on a single
   machine; declare it before a second client or machine shares this folder.`
+  Give the fix as one command, run in a terminal in the campus folder:
+  `python3 -I -B .campus-os/resolve-seat.py --init-seat --primary {this client}`.
   `invalid` -> `[!!]` with the detail; fix that one file. A declared
   satellite -> `[!!]` nothing is proven. Silence about ownership is never
   proof of it.
@@ -322,3 +336,12 @@ newest entry age (older than 7 days -> "Your campus stopped keeping its work
 diary - future skill suggestions depend on it"), unstamped lines (`[--]`,
 name the count), malformed lines (`error`). Add the backup reminder from
 `manual-checks.md` on this line.
+
+Every line is also read against the one line shape (`schemas/ledger-line.schema.json`, 5.3.0). Read-permissive: lines written before it (no `seat`, `timestamp` instead of `ts`, extra keys) count as `legacy_lines` and never turn the line red; so does a word outside a key's list (an older `via` such as `binding-file-read`). A key that is present with the wrong type (for example `tokens_in: "12"`) is listed in `shape_errors` and makes the line `[!!]`: name the file and line, never rewrite it - ledgers are append-only; the fix is the writer.
+
+## `runtime_drift` (new, 5.3.0)
+
+The generalized form of the campus-ambassador evening fault: a host fires its RUNTIME copy of a job, not the campus's `scheduled/{taskId}.md`, so a check that reads only the canonical file can stay green while the job does something else. `tools/check_runtime_drift.py` compares every runtime copy under each `--runtime-dir`: a pointer copy (names `scheduled/{x}.md` and defers to it) drifts if it names a missing file or a different job's file; a copy that carries the instructions itself drifts if its body differs from the canonical file (frontmatter, HTML comments and whitespace ignored). A runtime copy with no canonical file is `unowned` (`[--]`, opportunity), never drift.
+
+- `skipped` without `--runtime-dir`, or when the campus keeps no `scheduled/` folder (the convention is opt-in, same restraint as `schedules`).
+- `needs-decision` on any drift -> name the job and the kind; the fix to OFFER is to turn the runtime copy into a pointer at the canonical file. Which copy is right is the owner's decision; the tool never edits either side.

@@ -39,12 +39,17 @@ quick path included; never skip the ask.
 > **B) Quick start (~10 min).** Four questions, then I make you something
 > real right now. I'll ask about the rest as we work. Fair warning: my early
 > drafts will be rougher until those files fill in.
-> Most people do the full onboarding once, up front. Want **A**, or start
-> quick with **B**?"
+> **C) Start from what you already have (~10 min of your time).** Drop your
+> business documents into a folder, share your website, and paste in what
+> ChatGPT or Claude already knows about you. I read it all first, tell you
+> what I learned, and ask only about what's missing. Your files stay in this
+> folder on your computer.
+> Most people do the full onboarding once, up front. Want **A**, start quick
+> with **B**, or hand me what you have with **C**?"
 
-Rules: no third path. B is a real, visible choice - never hidden, never
-chosen silently; if they pick B, say so ("Quick start it is - four
-questions."). If they just start answering business questions, treat it as A
+Rules: B and C are real, visible choices - never hidden, never chosen
+silently; if they pick B, say so ("Quick start it is - four questions."); if
+they pick C, say so ("Let's start from what you have."). If they just start answering business questions, treat it as A
 and say so ("Sounds like you're up for the full version - let's keep
 going.").
 
@@ -54,7 +59,12 @@ builds the shell with every `shared/` file at DEFAULT, then runs
 full-onboarding asks business, audience, offers, goals, tools and voice in
 depth, sees the filing key is already set and won't re-ask it. **B** works
 through the four quick questions one at a time, builds the shell, seeds the
-files from the answers (SEEDED), then First Win.
+files from the answers (SEEDED), then First Win. **C** asks ONLY the filing
+question (Q4), builds the shell with every `shared/` file at DEFAULT, then
+runs /campus-intake. Everything it imports is written SEEDED, never DRAFTED,
+until the owner has heard it back and okayed it: /full-onboarding skips
+DRAFTED files, so a file marked DRAFTED too early would never get its
+confirmation pass.
 
 ## Step 1b - the four quick questions (path B), one at a time
 
@@ -126,6 +136,25 @@ name to write: a bad read returns nothing, a bad write manufactures a fact -
 and here the manufactured fact becomes the voice of every draft. Build-gate
 check 23 requires the three acting lines (declare / ask regardless / never
 write unconfirmed) to survive in the skill.
+
+## Step 2b - which AI apps will work here
+
+"One more set-up question. Which AI apps will you use with this campus on
+this computer - just me, or others too (for example Codex or
+Antigravity)?"
+
+- "Just you" -> this app is the only seat. Say: "Got it - I'll keep the
+  books here and run anything on a schedule."
+- Others named -> "Got it. {Other app} can read everything and suggest
+  changes, but it can't change your files on its own until you say so.
+  Want that, or should it have the same say as me?" Only a clear "same
+  say" makes it primary too; this app keeps the schedules.
+- Never ask about apps the owner did not mention, and never ask about
+  machines: a second computer is set up from that computer.
+
+Why: two AIs that both think they own the files will overwrite each
+other. The safe default is one owner and the rest proposing, and the
+owner - not the AI - decides who gets more.
 
 ## Step 3 - the founding close
 

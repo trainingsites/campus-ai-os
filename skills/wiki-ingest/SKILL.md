@@ -31,7 +31,7 @@ Kernel preamble §4 applies: `references/kernel-preamble.md`.
 
 ## The Categories (FIXED at runtime — do not invent new ones)
 
-**The category list comes from the active pack, not from this file.** Read `packs/{active_pack}/pack.json` → `wiki_taxonomy` before routing anything (`active_pack` is named in `packs/active.json`). Each entry gives a `category` (the folder name) and `what` (what belongs in it).
+**The category list comes from the active pack, not from this file.** Read `packs/{active_pack}/pack.json` → `wiki_taxonomy` before routing anything (`active_pack` is named in `packs/active.json`). Each entry gives a `category` (the folder name) and `what` (what belongs in it). **Edition guard (5.3.5):** when the campus's `workspace.json` has a `pack` and it differs from `active_pack`, stop before reading or writing anything and send the owner to /update-workspace, which explains the two ways forward.
 
 The rule is unchanged and absolute: **the list you read is the complete list.** Every page belongs to exactly one category on it. If you can't classify something into one of them, it doesn't belong in the wiki. Never create a folder that isn't on the list.
 

@@ -25,12 +25,17 @@ if __name__ == "__main__":  # only when run as a tool; an importing program keep
 sys.path.append(str(Path(__file__).resolve().parent))
 from contract import Resolver, ContractError  # noqa: E402
 import kernel_kit  # noqa: E402
+import validate_ledger  # noqa: E402
 
 KERNEL = Path(__file__).resolve().parent.parent
 # Sub-tools run isolated (no script folder or env on the path), write no bytecode, read none from the kit.
 PY_ISOLATED = ['-I', '-B', '-X', f'pycache_prefix={NO_CACHE}']
 ORDER = ('workspace', 'version_lockstep', 'kernel_kit', 'registry', 'context_weight', 'results_ledgers',
-         'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'context_files', 'stale_work', 'ledger')
+         'schedules', 'seat_contract', 'fleet_sweep', 'staff', 'context_files', 'stale_work', 'ledger', 'runtime_drift')
+# 5.3.7: one clear line when this computer's Python cannot start isolated (a broken install), so the
+# sub-tool sections it blocks do not read as campus faults.
+PREFLIGHT_LINE = ('Python on this computer cannot start in isolated mode - repair or reinstall Python. '
+                  'This is the computer, not your campus')
 PREFIX = {'ok': '[OK]', 'opportunity': '[--]', 'needs-decision': '[!!]', 'skipped': '[--]', 'error': '[!!]'}
 
 
@@ -56,18 +61,34 @@ class SubtoolError(Exception):
 
 
 class Evidence:
-    def __init__(self, root, today, window=None, scheduled=None, sweep=False, installed=None, kit_manifest=None):
+    def __init__(self, root, today, window=None, scheduled=None, sweep=False, installed=None, kit_manifest=None, runtime_dirs=()):
         self.root, self.today, self.window = root, today, window
         self.installed, self.kit_manifest = installed or (kit_manifest or {}).get('kernel_version'), kit_manifest
+        self.runtime_dirs = list(runtime_dirs or ())
         self.asof = dt.datetime.combine(today, dt.time(), dt.timezone.utc)
         self.scheduled, self.sweep = scheduled, sweep
         self.contract = Resolver()
         self.env = dict(os.environ, PYTHONDONTWRITEBYTECODE='1', CAMPUS_ROOT=str(root))
+        self.python, self.isolated, self.current, self.blocked = sys.executable, None, None, set()
+
+    def python_isolated(self):
+        """Can this interpreter start with -I at all? Checked once, before any sub-tool."""
+        if self.isolated is None:
+            try:
+                p = subprocess.run([self.python, *PY_ISOLATED, '-c', 'import encodings'], env=self.env,
+                                   text=True, capture_output=True, timeout=30)
+                self.isolated = {'ok': p.returncode == 0, 'exit_code': p.returncode, 'stderr_tail': p.stderr[-2000:]}
+            except (OSError, subprocess.TimeoutExpired) as exc:
+                self.isolated = {'ok': False, 'exit_code': None, 'stderr_tail': str(exc)[-2000:]}
+        return self.isolated
 
     def tool(self, name, *args, accepted=(0,), stdin='', command=None):
-        runtime = shutil.which('node') if name.endswith('.mjs') else sys.executable
+        runtime = shutil.which('node') if name.endswith('.mjs') else self.python
         isolate = [] if name.endswith('.mjs') else PY_ISOLATED
         argv = command or [runtime, *isolate, str(KERNEL / 'tools' / name), *map(str, args)]
+        if argv[0] == self.python and '-I' in argv[1:4] and not self.python_isolated()['ok']:
+            self.blocked.add(self.current)
+            raise SubtoolError(name, self.isolated['exit_code'], self.isolated['stderr_tail'])
         try:
             p = subprocess.run(argv, cwd=self.root, env=self.env, input=stdin,
                                text=True, capture_output=True, timeout=60)
@@ -212,7 +233,7 @@ class Evidence:
                 'tool.assess_health = lambda live: original(live, now=now); '
                 'sys.argv = [tool.__file__, "--scheduled", sys.argv[3], "--json"]; '
                 'raise SystemExit(tool.main())')
-        command = [sys.executable, *PY_ISOLATED, '-c', code, str(KERNEL / 'tools'), self.asof.isoformat(), str(self.root / 'scheduled')]
+        command = [self.python, *PY_ISOLATED, '-c', code, str(KERNEL / 'tools'), self.asof.isoformat(), str(self.root / 'scheduled')]
         data, rc = self.tool('check_cron_parity.py', command=command, stdin=self.scheduled, accepted=(0, 1))
         if data['scheduler']['status'] == 'unavailable':
             return section('skipped', 'Scheduler unavailable on this host', **data)
@@ -349,6 +370,9 @@ class Evidence:
         if primary.is_file():
             paths.add(primary)
         newest, unstamped, lines, errors = None, 0, 0, []
+        # 5.3.0 item 4: one line shape (schemas/ledger-line.schema.json), read-permissive.
+        # Legacy lines (no seat, `timestamp`, extra keys) never fail; a present key with the wrong type does.
+        schema, shape_errors, legacy = validate_ledger.load_schema(), [], 0
         for path in sorted(paths):
             for n, line in enumerate(path.read_text(encoding='utf-8').splitlines(), 1):
                 # Header comment lines are part of every founded ledger
@@ -362,19 +386,43 @@ class Evidence:
                     if not isinstance(record, dict):
                         raise ValueError('not an object')
                     unstamped += not bool(record.get('seat'))
+                    category, why = validate_ledger.classify(record, schema)
+                    legacy += category == 'legacy'
+                    if category == 'invalid':
+                        shape_errors.append({'file': str(path.relative_to(self.root)), 'line': n, 'errors': why[:3]})
                     if record.get('ts') is not None:
                         value = stamp(record['ts'])
                         newest = max(newest, value) if newest else value
                 except (ValueError, TypeError) as exc:
                     errors.append({'file': str(path.relative_to(self.root)), 'line': n, 'error': str(exc)})
-        return section('error' if errors else 'opportunity' if unstamped or newest is None else 'ok',
-                       f'Activity ledger: {lines} lines, {unstamped} unstamped',
+        shape = f', {len(shape_errors)} mis-typed' if shape_errors else ''
+        return section('error' if errors else 'needs-decision' if shape_errors else
+                       'opportunity' if unstamped or newest is None else 'ok',
+                       f'Activity ledger: {lines} lines, {unstamped} unstamped{shape}',
                        files=len(paths), lines=lines, newest_ts=newest.isoformat() if newest else None,
-                       unstamped_lines=unstamped, errors=errors)
+                       unstamped_lines=unstamped, legacy_lines=legacy, shape_errors=shape_errors, errors=errors)
+
+    def runtime_drift(self):
+        # 5.3.0 item 4: the generalized runtime-vs-canonical drift check (logging PRD decision:
+        # it lives in campus-doctor). Reported, never fixed. Host-neutral: the caller names the
+        # host's runtime-copy folders with --runtime-dir; without one the section is skipped.
+        if not self.runtime_dirs:
+            return section('skipped', 'Runtime drift skipped: no runtime-copy folder supplied', reason='no-runtime-dir')
+        args = ['--campus-root', self.root, '--json']
+        for d in self.runtime_dirs:
+            args += ['--runtime-dir', d]
+        data, rc = self.tool('check_runtime_drift.py', *args, accepted=(0, 1))
+        data['drift_status'] = data.pop('status', None)
+        if data['drift_status'] == 'not_applicable':
+            return section('skipped', 'Runtime drift skipped: no scheduled/ definitions on this campus', **data)
+        drift, unowned = len(data['drift']), len(data['unowned'])
+        return section('needs-decision' if drift else 'opportunity' if unowned else 'ok',
+                       f"Runtime drift: {data['checked']} runtime copies, {drift} drift from canonical, {unowned} unowned", **data)
 
     def run(self):
         result = {'generated': {'today': self.today.isoformat()}}
         for name in ORDER:
+            self.current = name
             try:
                 result[name] = getattr(self, name)()
             except SubtoolError as exc:
@@ -382,6 +430,12 @@ class Evidence:
             except Exception as exc:
                 result[name] = section('error', f'{name}: {type(exc).__name__}: {exc}',
                                        error=type(exc).__name__, message=str(exc))
+            if name in self.blocked:
+                result[name] = section('skipped', f'{name}: not checked (Python cannot start in isolated mode)',
+                                       reason='python-isolated-unavailable')
+        if self.blocked:  # present only on failure: a healthy run keeps its byte-stable shape
+            result['preflight'] = section('error', PREFLIGHT_LINE, python=self.python,
+                                          blocked=[n for n in ORDER if n in self.blocked], **self.isolated)
         return result
 
 
@@ -396,6 +450,8 @@ def main(argv=None):
     ap.add_argument('--installed-version', help='installed plugin version, read from its manifest (pass it when running from the campus kit)')
     ap.add_argument('--kit-manifest', help="the installed plugin's tools/kit-manifest.json; '-' reads it from stdin "
                                            '(pass it when running from the campus kit)')
+    ap.add_argument('--runtime-dir', action='append', default=[],
+                    help="host folder of runtime job copies ({taskId}/SKILL.md); repeatable; campus-relative if relative")
     a = ap.parse_args(argv)
     root = Path(a.campus_root).resolve()
     today = a.today or dt.datetime.now(dt.timezone.utc).date()
@@ -405,7 +461,7 @@ def main(argv=None):
         if a.scheduled_json and a.scheduled_json != '-':
             path = Path(a.scheduled_json)
             try:
-                scheduled = (path if path.is_absolute() else root / path).read_text(encoding='utf-8')
+                scheduled = (path if path.is_absolute() else root / path).read_text(encoding='utf-8-sig')
             except (OSError, UnicodeError) as exc:
                 # Carry the read failure into schedules without losing other sections.
                 schedule_error = str(exc)
@@ -414,13 +470,13 @@ def main(argv=None):
             if a.kit_manifest == '-' and a.scheduled_json == '-':
                 raise SystemExit('FAIL(2): only one of --kit-manifest and --scheduled-json can read stdin')
             try:
-                kit_manifest = json.loads(sys.stdin.read() if a.kit_manifest == '-' else Path(a.kit_manifest).read_text(encoding='utf-8'))
+                kit_manifest = json.loads(kernel_kit.read_input(a.kit_manifest))
             except (OSError, ValueError) as exc:
                 raise SystemExit(f'FAIL(2): --kit-manifest unreadable: {exc}')
         if a.scheduled_json == '-':
-            raw = sys.stdin.read()
+            raw = kernel_kit.read_input('-')
             scheduled = raw if raw.strip() else None
-        result = Evidence(root, today, a.window, scheduled, a.sweep, a.installed_version, kit_manifest).run()
+        result = Evidence(root, today, a.window, scheduled, a.sweep, a.installed_version, kit_manifest, a.runtime_dir).run()
         if schedule_error:
             result['schedules'] = section('error', 'Schedule input could not be read', stderr_tail=schedule_error[-2000:])
     except ContractError as exc:
@@ -430,11 +486,13 @@ def main(argv=None):
     if a.json:
         print(json.dumps(result, sort_keys=True, indent=2))
     else:
+        if 'preflight' in result:
+            print(result['preflight']['line'])
         for name in ORDER:
             print(result[name]['line'])
     # SKILL contract: 0 = every section produced evidence and nothing is red; 1 = evidence collected and some
     # lines are red (needs-decision or a section-level error); 2 = the tool itself failed (raised above).
-    return 1 if any(result[name]['status'] in ('needs-decision', 'error') for name in ORDER) else 0
+    return 1 if 'preflight' in result or any(result[name]['status'] in ('needs-decision', 'error') for name in ORDER) else 0
 
 
 if __name__ == '__main__':

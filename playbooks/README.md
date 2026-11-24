@@ -10,6 +10,7 @@
 
 A playbook is a `SKILL.md` folder carrying a `playbook:` contract block (socket spec Part 1). It declares, in order:
 
+- **PURPOSE** — one line under the title, `**PURPOSE:**` then what motivated this playbook and where the evidence that it works lives (WikiSkill C, 5.3.0)
 - **trigger** — event / cadence / manual, and the phrase or condition that fires it
 - **goal** — objective and checkable ("make it good" is banned)
 - **topology** — solo / maker-checker / manager-helpers (a full waterfall is manager-helpers; Dean is the manager)
@@ -169,7 +170,7 @@ do not write a `target` either — write nothing.
 **Ledger line per stage** (extends the fixed ledger format additively with two Seam-B fields). Write each line in **compact JSON** (house style, no spaces after `:`/`,`) and **stamp `ts` at the moment that stage completes** — not retroactively at the end of the run. Per-stage timestamps make the tier split visible (you can see light stages finishing faster than full ones).
 
 ```json
-{"ts":"...","session":"S###","skill":"content-repurposer","trigger":"one-recording-to-a-week-of-content stage 1","dept":"marketing","outcome":"completed","files_touched":1,"run_id":"one-recording-20260706-235500","tier_requested":"light","tier_used":"light"}
+{"ts":"...","session":"S###","skill":"content-repurposer","skill_version":"{version from its frontmatter}","trigger":"one-recording-to-a-week-of-content stage 1","dept":"marketing","outcome":"completed","files_touched":1,"run_id":"one-recording-20260706-235500","tier_requested":"light","tier_used":"light"}
 ```
 
 ---

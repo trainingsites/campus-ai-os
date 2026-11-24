@@ -7,7 +7,7 @@ description: >
   lanes, seat stamps, sync hazards). Reads one deterministic evidence command.
   Use when the owner says "/campus-doctor", "health check",
   "something's not working", or "is everything ok".
-version: 5.2.18
+version: 5.3.8
 department: kernel
 ---
 
@@ -53,10 +53,14 @@ into a check that READS one.**
    No kit and no way to copy one, but this shell sees the plugin: run the
    plugin's `tools/doctor_evidence.py` instead and say so.
 
+   **On Windows** the command is usually `python` (or `py -3`), not
+   `python3`. Pass the manifest as a file path (`--kit-manifest PATH`) when
+   the shell cannot pipe it cleanly; a byte-order mark on the pipe is accepted.
+
    Add `--scheduled-json PATH` (or `-` with the list on stdin) when THIS host
    can list its scheduled jobs, using the envelope in `evidence-sections.md`;
    **never call a scheduler API from this skill.** Add `--sweep` when the owner says "sweep
-   the fleet".
+   the fleet". Add `--runtime-dir PATH` (repeatable) for each folder where THIS host keeps its runtime job copies (`{taskId}/SKILL.md`), when you know it.
 
    **Exit codes.** `0`: every section produced evidence. `1`: evidence was
    collected and **some lines are red** - read the JSON and report it; this
@@ -64,7 +68,14 @@ into a check that READS one.**
    tool itself failed** - say so, show its last stderr lines, and do not
    invent numbers.
 
-3. **Explain the thirteen sections in order**, one line each - never fold two
+   **Python that cannot start isolated.** When the JSON carries a `preflight`
+   entry, or the command dies with `Failed to import encodings`, say that one
+   line first and plainly: Python on this computer cannot start in isolated
+   mode, so repair or reinstall Python. It is the computer, not the campus.
+   The sections it blocked read `[--] not checked`. Never drop `-I` to get
+   past it.
+
+3. **Explain the fourteen sections in order**, one line each - never fold two
    sections into one line (5.2.12: `context_files` was merged into the stale-work line). Start from each
    section's `line`; use `detail` for the fix. Status -> prefix: `ok` ->
    `[OK]`; `opportunity` or `skipped` -> `[--]`; `needs-decision` or `error`
@@ -84,7 +95,8 @@ into a check that READS one.**
    | `staff` | org chart: employees + campus systems + playbooks, per-department; orphans loud |
    | `context_files` | a concept held in two files (e.g. `icp.md` beside `audience.md`); the first in read order is the one every skill reads; offer to merge, never merge unasked |
    | `stale_work` | active-work files over 14 days old |
-   | `ledger` | newest entry across every ledger shard; unstamped lines |
+   | `ledger` | newest entry across every ledger shard; unstamped lines; mis-typed lines against the one line shape |
+   | `runtime_drift` | each runtime job copy vs its canonical `scheduled/` file; drift is reported, never fixed; skipped without `--runtime-dir` |
 
    Staff-line rules the tool applies and you must not undo:
    it RESOLVES `dean` to `dean-office` before matching;

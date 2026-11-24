@@ -1,7 +1,7 @@
 {
   "name": "campus-ai-os",
   "owner": {"name": "TrainingSites.io", "url": "https://trainingsites.io"},
-  "description": "Campus AI OS: a free AI operating system for education businesses.",
+  "description": "Campus AI OS: your Chief of Staff Agent and the AI staff it manages.",
   "plugins": [
     {
       "name": "campus-ai-os",

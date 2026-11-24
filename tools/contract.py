@@ -143,7 +143,17 @@ class Resolver:
                  bool(self.seat_rx.fullmatch(info['seat'])) and info.get('role') in self.seat['roles'])
         state = 'valid' if valid else 'missing' if info is None else 'invalid'
         role, seat = (info['role'], info['seat']) if valid else ('satellite', 'unknown')
-        ledger = self.seat['ledger'][role if valid else 'unknown'].format(seat=seat)
+        # SEC-05: the shared ledger follows `owns_clock` (resolve-seat.py output), never role alone.
+        # A primary without owns_clock: true gets its own shard - fail closed.
+        if not valid:
+            key = 'unknown'
+        elif role == 'primary' and info.get('owns_clock') is True:
+            key = 'primary'
+        elif role == 'primary':
+            key = 'co_primary' if 'co_primary' in self.seat['ledger'] else 'satellite'
+        else:
+            key = 'satellite'
+        ledger = self.seat['ledger'][key].format(seat=seat)
         lane = self.seat['lane']['satellite'].format(seat=seat) if role == 'satellite' else None
         return {'state': state, 'role': role, 'seat': seat, 'ledger': ledger, 'lane': lane}
 

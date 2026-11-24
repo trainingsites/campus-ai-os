@@ -50,7 +50,7 @@ Show: the slug, target path, triggers, and the three actions (create skill folde
 
 On confirm:
 
-1. Create `{dept-folder}/skills/{slug}/SKILL.md` - frontmatter `name:` + `description:` (built from the candidate's trigger_examples), body copied from the candidate file.
+1. Create `{dept-folder}/skills/{slug}/SKILL.md` - frontmatter `name:` + `description:` (built from the candidate's trigger_examples) + `version: 1.0.0` + the candidate's `purpose:`, body copied from the candidate file with its `**PURPOSE:**` line kept (the promoted skill keeps the evidence that motivated it).
 2. Register in `.campus-os/registry.json` - APPEND a new entry to `teams` (append-only, never rewrite existing entries):
 
 ```json

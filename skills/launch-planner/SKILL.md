@@ -79,7 +79,7 @@ Generate or delegate:
 
 Write a brief for each department involved:
 - **Content work** → social posts and content assets (employees: content-repurposer, social-planner)
-- **Onboarding the people you serve** → student/client onboarding prep (employees: student-comms, client-comms)
+- **Onboarding the people you serve** → student/client onboarding prep (employees: student-comms or client-comms, whichever this campus has)
 - **Emails and launch execution** (employees: email-sequence, launch-planner)
 Name each department by the registry label of the roster that holds the employee (kernel preamble §2); never by a typed department name.
 

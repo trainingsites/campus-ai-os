@@ -145,8 +145,8 @@ auto-discovery. But two things follow, and they are not optional:
 - **Keep the root entry file tiny.** It is a redirect, not a brain. Anything
   bulky belongs in `dean/`.
 - **A campus brain can outgrow the cap.** The shipped template
-  `templates/dean-CLAUDE.md` is ~8 KB (fine). A mature campus is not — the
-  TrainingSites dogfood `dean/CLAUDE.md` measured **35,876 B on 2026-07-25,
+  `templates/dean-CLAUDE.md` is ~8 KB (fine). A mature campus is not — one
+  long-running campus's `dean/CLAUDE.md` measured **35,876 B on 2026-07-25,
   already past 32 KiB.** If an owner ever places campus content directly in the
   auto-discovered chain, it silently truncates. Owners can raise the limit in
   `~/.codex/config.toml`; the kernel should not assume they have.

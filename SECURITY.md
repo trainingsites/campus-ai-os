@@ -24,4 +24,4 @@ Any file another process can write is untrusted. That includes every seat ledger
 
 ## Release integrity
 
-Every release ships as a `.plugin` and a byte-identical `.zip`, with the hash emitted by `tools/package.py` into `campus-ai-os-v{version}.PACKAGE.json`. Compare the archive hash to that file before installing. Released archives are immutable; a fix is always a new version.
+Every release ships as a `.plugin` and a byte-identical `.zip`, with the hash emitted by `tools/package.py` into `campus-ai-os-v{version}.PACKAGE.json`. The record is attached to each GitHub release next to the archives (`https://github.com/trainingsites/campus-ai-os/releases`); it is not inside the archive, because a file cannot carry its own hash. If you downloaded from the website, get the record from the release with the same version number. Compare the archive hash to the record's `sha256` before installing: `shasum -a 256 FILE` on macOS or Linux, `certutil -hashfile FILE SHA256` on Windows. Released archives are immutable; a fix is always a new version.

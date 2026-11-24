@@ -3,9 +3,9 @@ name: update-workspace
 description: >
   Safely upgrade an existing Campus AI OS campus (any earlier version) to the
   installed version, keeping everything the owner wrote intact. Use when the
-  owner says "/update-workspace", "upgrade my campus", "update my campus", or
-  when an older campus is detected.
-version: 5.2.18
+  owner says "/update-workspace", "upgrade my campus", "update my campus",
+  "undo the last update", or when an older campus is detected.
+version: 5.3.8
 department: kernel
 ---
 
@@ -13,7 +13,8 @@ department: kernel
 
 The prime directive: an upgrade can NEVER destroy anything the owner wrote.
 This skill only ADDS. It never rewrites, deletes, renames, or "refreshes" an
-existing file (exception: item 12e's kernel canons). If a step would break
+existing file (exceptions: item 12e's kernel canons; department labels
+after the owner types RENAME, part b). If a step would break
 that rule, stop and ask. Lookup files: this skill's `references/`
 (`baseline-items.md`, `additions.md`).
 
@@ -29,13 +30,29 @@ hardcoded version literal.**
 
 ## Step 0 - What's here
 
+↩️ **"Undo the last update":** do only `additions.md` -> "Undo". Skip the
+edition check and every step below; the undo tool is the same in every
+edition, so it runs whichever edition is installed.
+
 The campus root holds a `dean/` entry file (any of the four). Markers: `workspace.json`, that entry
 file, `shared/` with content, `.campus-os/`. Route by comparing the campus
 marker to `OS_VERSION`:
 
+🛑 **Edition check - first, before any route below and before item 18.** Only
+when a campus marker exists (a fresh folder goes straight to "No markers"). Compare the
+campus's `workspace.json` -> `pack` with the plugin's `packs/active.json` ->
+`active_pack` (`additions.md`, "v5.3.5 additions", part b). Different
+editions: stop, zero writes, say so in plain words. Never relabel an
+existing campus for another edition. An owner who answers "this edition"
+when the names differ is asked once more, with the renames shown, before
+anything is written (part b, "Second confirm").
+
 - **No markers:** fresh folder; offer /campus-start, never build here.
-- **Marker == `OS_VERSION`:** "You're already up to date." Run item 18
-  only (the kit check; a missing or damaged kit is re-copied), then offer
+- **Marker == `OS_VERSION`:** "You're already up to date." Steps 1-3
+  first when anything below will write, then run item 18
+  (the kit check; a missing or damaged kit is re-copied) and the v5.3.5
+  parts of item 17 (seat file, `pack`, job cards, each only when absent),
+  then offer
   /campus-doctor. The ONLY up-to-date case: a comparison, never a literal.
 - **Marker < `OS_VERSION`:** an upgrade is owed. Pick the entry point for
   that marker from `baseline-items.md`.
@@ -54,7 +71,10 @@ and stamp `OS_VERSION`.
    wait for an explicit go.
 3. Copy the entry file, memory.md, TASKS.md and each shared file to
    `dean/archive/pre-v3/{date}/` (never `dean/` recursively into itself);
-   restore from it on failure.
+   restore from it on failure. Then take the undo snapshot, before the
+   first write of any kind: `python3 -I -B tools/update_undo.py snapshot
+   --campus-root {campus_root}` from the plugin root; after the last write,
+   `seal` with the name it printed (`additions.md`, "Undo").
 
 ## Step 4 - The upgrade (additive only)
 
@@ -68,7 +88,7 @@ row; goals stub if absent; `dean/skill-candidates/`; item 8,
 `.campus-os/registration-block-spec.md`, now item 16.
 
 **Items 11-18 run on every path** (`additions.md`). Item 18 (the kernel
-kit) runs FIRST, before item 11: every later `tools/` command runs from
+kit) runs FIRST, after the Step 0 edition check and the Step 3 snapshot, before item 11: every later `tools/` command runs from
 the kit (Kernel preamble §5).
 
 11. **v4 additions (every campus, run last).**
@@ -116,6 +136,10 @@ the kit (Kernel preamble §5).
     `<!-- campus-os:outside-text -->` if absent (owner text never rewritten),
     and say once that `tools/resolve_context.py` now finds the campus and its
     context files. The 12e canon refresh already carries the new read order.
+    Then v5.3.5: write the seat file when the campus has none (ask which
+    apps work here, never guess), and record the campus's edition as
+    `workspace.json` -> `pack` when the key is absent; copy the pack's job
+    cards to `dean/job-cards.md` when it ships them and the campus has none.
 18. **Kernel kit (every campus, kernel-owned files only).** Copy or refresh
     `.campus-os/kernel/` from the plugin's `tools/kit-manifest.json`: the
     `core` tier always, the `on_demand` tier when this run uses one of its
@@ -132,12 +156,13 @@ is valid, record it.
 
 wiki/, memory.md contents, outputs/, inputs/, daily/, department and manager
 folders, active-work/, library/, TASKS.md, archives, any owner-written
-section. Nothing is deleted or renamed.
+section. Nothing is deleted or renamed (department labels: part b only).
 
 ## Step 5 - Report; rules
 
 Created, inserted where, safety copy location, staff line before/after,
-weight verdict, one next step: /campus-doctor.
+weight verdict, the one sentence that says how to undo this update
+(`additions.md`, "Undo"), one next step: /campus-doctor.
 Grade-8 words. Preview before write; explicit go before Step 3; running
 twice adds nothing twice.
 

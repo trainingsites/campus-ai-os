@@ -1,6 +1,6 @@
 ---
 name: morning-brief
-description: Daily intelligence briefing - what's happening, what to work on, what needs attention. Use when user says "morning brief", "what should I work on", "daily brief", "what's on today", or at the start of a work session.
+description: Daily intelligence briefing - what's happening, what to work on, what needs attention. Use when user says "morning brief", "what should I work on", "daily brief", "what's on today", or at the start of a work session. Only inside a campus (a folder with workspace.json); in any other chat, answer normally instead.
 department: dean-office
 ---
 

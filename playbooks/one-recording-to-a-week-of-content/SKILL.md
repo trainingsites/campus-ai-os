@@ -5,6 +5,8 @@ description: Turn ONE recording, transcript, or set of notes into a full week of
 
 # Playbook — One Recording → A Week of Content
 
+**PURPOSE:** one source in, a week of review-ready drafts out - the kernel's showcase that starter employees chain into a verified waterfall with a light/full tier split; the evidence is each run's `results.json` plus its per-stage ledger lines (`run_id`, `tier_used`) in the run dir.
+
 **The showcase.** The owner drops one source (a call recording, a webinar transcript, a YouTube transcript, or raw notes) into `inputs/`, runs this playbook, and gets a week of ready-to-review marketing in the owner's voice. Six stages, all starter employees, no paid teams, no connectors required, draft-first. The ledger shows a real light/full tier split.
 
 Dean runs this. Read `playbooks/README.md` (the runtime) once before your first playbook run.

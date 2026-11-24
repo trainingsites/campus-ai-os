@@ -1,0 +1,442 @@
+{
+  "pack": "coach",
+  "label": "Professional Coach",
+  "version": "5.3.8",
+  "identity": {
+    "business_noun": "coaching practice",
+    "owner_line": "The owner is a professional coach who wears many hats: coach, program designer, writer, marketer, enrollment lead, bookkeeper.",
+    "customer_noun": "client",
+    "founding_frame": "You're not installing software. You're setting up a custom one-person business with the AI employees and skills you want for your coaching practice - one coach wearing many hats, backed by an AI staff that remembers everything and does real work. I'm your chief of staff: I run the business, route the work, and protect you from mistakes. What a client tells you stays with you, except what your agreement with them says can be shared. Nothing reaches a client or a sponsor unless you send it yourself.",
+    "q1": "What's your coaching practice? Who do you coach, and what changes for them?",
+    "q1_pushback": "Say it the way you'd say it to someone deciding whether to hire you.",
+    "q2_examples": "one-to-one coaching, a group membership or community, a group program, workshops, an advisory retainer, leadership programs for a company, coaching through a platform, a book or course"
+  },
+  "departments": [
+    "education",
+    "community",
+    "marketing",
+    "sales",
+    "lead-generation",
+    "operations"
+  ],
+  "managers": [
+    {
+      "id": "education",
+      "display_name": "Sessions & Programs",
+      "dept_dir": "departments/education/",
+      "reports_to": "dean",
+      "shape": "hybrid",
+      "state_file": "departments/education/class-schedule.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "class-scan",
+          "cron": "0 9 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "finds the week's client sessions and group calls needing prep, materials, or a follow-up draft"
+        }
+      ],
+      "gates": {
+        "course_publish": {
+          "mode": "owner_batch_gate",
+          "note": "Program material reaches paying clients. The coach reviews before anything goes live."
+        },
+        "email": {
+          "mode": "draft"
+        },
+        "community": {
+          "mode": "dark",
+          "note": "Client Care owns the feed."
+        },
+        "social": {
+          "mode": "dark"
+        },
+        "session_notes": {
+          "mode": "dark",
+          "note": "Session notes are confidential. This department prepares agendas and follow-up drafts from what the coach writes down; it never records, transcribes, or shares a session, and never carries one client's material into another's. The coach's own typed notes only, kept short."
+        },
+        "recordings_transcripts": {
+          "mode": "dark",
+          "note": "One-to-one sessions are never recorded, transcribed, or given to an AI notetaker by this department; the coach writes their own notes. Group calls a coach records for member replay are the coach's own publishing decision, with notice to the group; this department does not touch those recordings until the coach opens this gate."
+        },
+        "restricted_client": {
+          "mode": "dark",
+          "note": "A client under 18, or a client whose sessions hold clinical or health information: stop drafting and route to the coach. Consent and reporting rules depend on where the coach works; this department does not know them."
+        },
+        "health_information": {
+          "mode": "dark",
+          "note": "No diagnosis, no interpretation of a condition or a lab result, no medical advice. A coach is not a clinician and neither is this department."
+        },
+        "sponsor_report": {
+          "mode": "owner_batch_gate",
+          "note": "Nothing about a person being coached goes to the company paying for it unless the coaching agreement records what may be shared. Default is a coach-approved summary of themes, never details."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "What happens in a session is the client's. Prep is drafted; nothing about a session leaves the campus on its own."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/education/{run_id}/"
+      }
+    },
+    {
+      "id": "community",
+      "display_name": "Client Care",
+      "dept_dir": "departments/community/",
+      "reports_to": "dean",
+      "shape": "roster",
+      "state_file": "departments/community/client-roster.md",
+      "state_stale_after_days": 5,
+      "cadence": [
+        {
+          "task": "community-pulse",
+          "cron": "0 8 * * *",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "lists who has an open commitment coming due (only what the coach logged after each call, never inferred from a session) and whether last call's commitments happened, who is at the mid-point of an engagement, who is within 30 days of a package ending or has been a monthly client long enough for a 'what's next' conversation, who went quiet, and who needs a personal touch today"
+        }
+      ],
+      "gates": {
+        "community": {
+          "mode": "draft",
+          "note": "This department owns the client community surface, but a fresh install still drafts."
+        },
+        "email": {
+          "mode": "draft",
+          "note": "Check-ins and nudges are drafts the coach sends by hand."
+        },
+        "social": {
+          "mode": "dark",
+          "note": "Content & Visibility owns social."
+        },
+        "session_notes": {
+          "mode": "dark",
+          "note": "Same rule as Sessions & Programs: nothing from a session is carried into a check-in unless the coach wrote it down for that purpose."
+        },
+        "between_session_chat": {
+          "mode": "dark",
+          "note": "Voice and chat apps the coach uses with clients (Voxer, WhatsApp) stay outside the campus. This department drafts; it never reads or sends in them."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "A message to a client in the coach's name is the relationship itself. It is the last thing to automate, not the first."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/community/{run_id}/"
+      }
+    },
+    {
+      "id": "marketing",
+      "display_name": "Content & Visibility",
+      "dept_dir": "departments/marketing/",
+      "reports_to": "dean",
+      "shape": "calendar",
+      "state_file": "departments/marketing/content-calendar.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "weekly-content-planning",
+          "cron": "0 17 * * 5",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "fills next week's open slots from research briefs; queues production jobs"
+        }
+      ],
+      "gates": {
+        "social": {
+          "mode": "draft",
+          "note": "Buyer sets grants during onboarding. Nothing auto-posts on a fresh install."
+        },
+        "email": {
+          "mode": "draft",
+          "note": "Campaign drafts only - sending to a real list is the owner's call."
+        },
+        "blog": {
+          "mode": "draft"
+        },
+        "community": {
+          "mode": "dark",
+          "note": "The community feed belongs to Client Care. This department queues, it does not post."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "A coach is hired for their voice. Content is drafted in it and published by them."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/marketing/{run_id}/"
+      }
+    },
+    {
+      "id": "sales",
+      "display_name": "New Clients",
+      "dept_dir": "departments/sales/",
+      "reports_to": "dean",
+      "shape": "pipeline",
+      "state_file": "departments/sales/enrollment-pipeline.md",
+      "state_stale_after_days": 7,
+      "stages": [
+        "inquiry",
+        "call_booked",
+        "call_held",
+        "offer_sent",
+        "enrolled",
+        "not_now",
+        "lost",
+        "dormant"
+      ],
+      "stage_aging_alert_days": 14,
+      "cadence": [
+        {
+          "task": "weekly-pipeline-review",
+          "cron": "0 16 * * 5",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "ages every new-client conversation, flags stalls past stage_aging_alert_days, and lists this week's first calls, applications to answer, and follow-ups"
+        }
+      ],
+      "gates": {
+        "outreach_email": {
+          "mode": "draft",
+          "note": "Every outbound email is a draft the owner sends by hand. Nothing auto-sends to a human being."
+        },
+        "crm_write": {
+          "mode": "draft"
+        },
+        "proposal": {
+          "mode": "draft"
+        },
+        "pricing": {
+          "mode": "owner_batch_gate",
+          "note": "No cadence run may quote, change, or discount a fee. Many coaches set the price in conversation around the client's situation; that conversation is the coach's alone."
+        },
+        "social": {
+          "mode": "dark",
+          "note": "Not this department's surface."
+        },
+        "sponsor_report": {
+          "mode": "owner_batch_gate",
+          "note": "Contracting with a company never promises reporting on the person coached beyond what the coaching agreement records. Nothing about a person being coached goes to the company paying for it unless the coaching agreement records what may be shared. Default is a coach-approved summary of themes, never details."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "An enrollment conversation is personal and often sensitive. Every message is a draft the coach sends."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/sales/{run_id}/"
+      }
+    },
+    {
+      "id": "lead-generation",
+      "display_name": "Referrals & Outreach",
+      "dept_dir": "departments/lead-generation/",
+      "reports_to": "dean",
+      "shape": "pipeline",
+      "state_file": "departments/lead-generation/prospect-list.md",
+      "state_stale_after_days": 7,
+      "stages": [
+        "sourced",
+        "researched",
+        "queued",
+        "contacted",
+        "replied",
+        "qualified",
+        "handed_to_sales",
+        "disqualified",
+        "dormant"
+      ],
+      "stage_aging_alert_days": 10,
+      "cadence": [
+        {
+          "task": "weekly-prospect-sweep",
+          "cron": "0 15 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "ages every prospect, refreshes the sourced list from the ICP, and surfaces who is ready to hand to Sales"
+        }
+      ],
+      "gates": {
+        "outreach_email": {
+          "mode": "draft",
+          "note": "Cold outreach is the strictest surface on the campus. Every message is a draft the owner sends by hand."
+        },
+        "list_building": {
+          "mode": "draft",
+          "note": "A prospect list is research, not contact. Building it is safe; using it is the owner's call."
+        },
+        "crm_write": {
+          "mode": "draft"
+        },
+        "social": {
+          "mode": "dark",
+          "note": "Not this department's surface - Content & Visibility owns social."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Outreach carries the coach's reputation with referrers and prospects. Draft-first, always."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/lead-generation/{run_id}/"
+      }
+    },
+    {
+      "id": "operations",
+      "display_name": "Practice Admin",
+      "dept_dir": "departments/operations/",
+      "reports_to": "dean",
+      "shape": "calendar",
+      "state_file": "departments/operations/admin-calendar.md",
+      "state_stale_after_days": 8,
+      "cadence": [
+        {
+          "task": "weekly-admin-scan",
+          "cron": "0 8 * * 1",
+          "enabled": false,
+          "model_tier": "light",
+          "advances": "lists the week's scheduling changes, agreements to send, invoices and renewals coming due, and credential hours or renewals that need logging"
+        }
+      ],
+      "gates": {
+        "email": {
+          "mode": "draft",
+          "note": "Every reply is a draft the coach sends by hand."
+        },
+        "calendar": {
+          "mode": "draft"
+        },
+        "invoicing": {
+          "mode": "owner_batch_gate",
+          "note": "This department lists what is due and drafts reminders. It never issues, changes, or collects an invoice."
+        },
+        "sponsor_report": {
+          "mode": "owner_batch_gate",
+          "note": "Nothing about a person being coached goes to the company paying for it unless the coaching agreement records what may be shared. Default is a coach-approved summary of themes, never details."
+        },
+        "credential_log": {
+          "mode": "draft",
+          "note": "Lists coaching hours and continuing-education credits from the coach's own records, clients as initials only. Never files an application or signs an attestation."
+        },
+        "supervision_material": {
+          "mode": "draft",
+          "note": "Prep for supervision or mentor coaching is anonymised by default."
+        }
+      },
+      "buyer_defaults": {
+        "all_surfaces": "draft",
+        "grants_set_during": "onboarding interview",
+        "rationale": "Scheduling and billing messages speak for the coach to paying clients. Nothing sends itself."
+      },
+      "interop": {
+        "mints_run_id": true,
+        "run_id_format": "{task}-{YYYYMMDD-HHMMSS}",
+        "writes_results_json": true,
+        "activity_ledger": "dean/.activity.jsonl",
+        "run_dir": "outputs/{YYYY-MM}/runs/managers/operations/{run_id}/"
+      }
+    }
+  ],
+  "_managers_notes": [
+    "DEFAULTS ONLY. A local {dept}/manager.json OVERRIDES this entry wholesale. Pack declares, owner disposes.",
+    "Every cadence ships enabled:false. Founding does not switch on recurring spend the owner has not agreed to; /campus-doctor and the onboarding ladder offer them later.",
+    "Every gate ships draft or darker, and buyer_defaults.all_surfaces is 'draft' on all four - enforced as an ERROR by tools/lint_managers.py, not left to good intentions.",
+    "dept_dir and state_file assume the 'departments' filing structure because that is the founding default. A clients or projects campus has NO department folders and still has all four managers - the staff org is independent of how finished work is filed. campus-start resolves the real paths and writes them literally into the local manager.json.",
+    "Consumers ENUMERATE the managers that exist and read each contract. Never hardcode these four ids, never assume dept_dir == id + '/', and never derive state_file - it is a literal declared path. Deriving it would have broken the first campus this ran on, whose folders are named '{dept}-manager/'.",
+    "The shape enum is CLOSED: calendar | pipeline | roster | hybrid. Shapes describe HOW STATE MOVES, not what business the pack serves. A consulting pack can declare desks called Studio and Bench and reuse these four shapes unchanged. A fifth shape is a kernel change and a version bump."
+  ],
+  "wiki_taxonomy": [
+    {
+      "category": "clients",
+      "what": "One page per client or sponsor. Goals, context, commitments made, what has worked. Only what the coach chooses to write down; never a transcript. When a company pays, one page for the sponsor and a separate page per person coached; never mix them."
+    },
+    {
+      "category": "concepts",
+      "what": "The coach's own methodology: named frameworks, canvases, roadmaps, questions, and exercises. Their IP, in their words."
+    },
+    {
+      "category": "programs",
+      "what": "One page per program, package, or workshop. Arc, session plans, materials, what changed between cohorts."
+    },
+    {
+      "category": "offers",
+      "what": "The ways to work with the coach, from a group membership up to one-to-one and by-application work: what each includes, the price or how the price is set, and the terms."
+    },
+    {
+      "category": "agreements",
+      "what": "Coaching agreements and sponsor terms: what may be shared and with whom, how long notes are kept. Terms only, never session content."
+    },
+    {
+      "category": "decisions",
+      "what": "Choices the coach made about the practice, with the reasoning, so they are not re-argued."
+    },
+    {
+      "category": "proof",
+      "what": "Client stories and results, each with the client's recorded permission and the exact words they approved. Nothing here is used without that permission on the page."
+    },
+    {
+      "category": "market",
+      "what": "Who hires coaches like this one, the words they use, referrers, and what competitors offer."
+    },
+    {
+      "category": "operations",
+      "what": "How the practice runs: scheduling, contracts, invoicing, renewals, tools."
+    },
+    {
+      "category": "outputs",
+      "what": "Finished work worth finding again."
+    },
+    {
+      "category": "departments",
+      "what": "Each department's working notes."
+    }
+  ],
+  "_wiki_taxonomy_notes": [
+    "This list is FIXED at runtime. The agent picks one of these per page and never invents a category.",
+    "A niche with a different shape declares its own list here; the kernel has no taxonomy of its own beyond a fallback.",
+    "Precedence when two fit: decisions > concepts (the call, then the reusable framework it produced); offers > projects (once it is for sale, the offer page is canonical and the project page becomes build history); operations > projects (a standing system, not a one-time build)."
+  ],
+  "domain_skills": [],
+  "shared_skills": [
+    "session-planner",
+    "community-pulse",
+    "course-builder"
+  ],
+  "hires": [],
+  "_notes": [
+    "Professional Coach niche template for the Custom Campus Builder. Every department a coach could need is declared; intake toggles them.",
+    "Promoted into the kernel tree's packs/ in 5.3.0 (from the Custom Campus Builder template).",
+    "Manifest is free and public by decision (2026-09-21). Coach-specific skills and hires are paid substance and live outside the public tree.",
+    "Deliberately NOT borrowed: student-comms (speaks of students; the kernel's client-comms serves a coach) and class-manager (offers to process recordings, which the recordings_transcripts gate forbids).",
+    "No retention period is stated anywhere in this template. None was found in research (2026-09-21); ask the coach and their insurer on the install call.",
+    "Checked 2026-09-21 against one live coach offer (a business and personal-brand coach selling a membership -> one-to-one -> by-application ladder). Changes: rolling monthly clients as well as fixed packages, group-call replays distinguished from one-to-one sessions, plain 'New Clients' label, proof and named frameworks given a home. One offer is one data point, not a pattern."
+  ]
+}

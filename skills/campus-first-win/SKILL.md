@@ -26,14 +26,16 @@ Requires `workspace.json` (run /campus-start first if missing). Works fine with 
 | Delivery | Deliverable |
 |---|---|
 | community | 5 ready-to-post discussion prompts for their topic and audience |
-| courses | a complete lesson plan for their next topic (ask which topic - one question) |
+| courses | a complete lesson plan for their next topic (ask which topic - one question); without `lesson-planner` installed, a course outline from `course-builder` |
 | coaching | a session prep pack for their next call (ask who/what - one question) |
 | mix | ask: "Which would help most this week?" and offer the three above |
 
-**The active pack's own work (5.3.0).** Read `packs/active.json` -> `active_pack`, then `packs/{active_pack}/pack.json` in this plugin, and take its `domain_skills[]`.
+**The active pack's own work (5.3.0).** Read `packs/active.json` -> `active_pack`, then `packs/{active_pack}/pack.json` in this plugin, and take its `domain_skills[]`. **Edition guard (5.3.5):** when the campus's `workspace.json` has a `pack` and it differs from `active_pack`, stop before reading or writing anything and send the owner to /update-workspace, which explains the two ways forward.
 
 - If that list is missing or empty, or already includes `community-pulse`, `lesson-planner` or `session-planner`, the table above is this pack's first win: use it unchanged.
 - Otherwise, offer each installed skill in that list (at most three) beside the table's deliverable, in the same one question, naming each by its deliverable from that skill's own `description`; produce the one the owner picks by following that skill's SKILL.md.
+
+**Job cards come first (5.3.5).** If `dean/job-cards.md` exists, the first win is the first card on it the owner has not done (judge that from the ledger, `outputs/` and `daily/`; when unclear, start at the first card and say so): say its name in one line, ask for what its **Needs** line asks for (one question), then do that card exactly - its **Rules** bind, its **Done** line is the test, and the result is saved where **Lands in** says. The owner may pick a different card. A playbooks section at the end of that file is not a card: never start the first win from it. Nor is a section that explains how to add a card or a playbook. The table and the pack list above apply only when there are no job cards. Close by naming the next card.
 
 At most ONE question before producing. If the answer is vague, make a sensible
 choice and say so.

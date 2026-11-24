@@ -17,8 +17,11 @@ This folder is where your campus tracks work. It replaces the single long
 Change a task → edit **its file** → rebake the index:
 
 ```bash
-python3 tools/generate_task_index.py --tasks dean/tasks --out dean/TASKS.md
+python3 -I -B .campus-os/kernel/tools/generate_task_index.py --tasks dean/tasks --out dean/TASKS.md
 ```
+
+The tool is part of the campus kernel kit (`.campus-os/kernel/`), copied at founding
+and on every update. Run it from the campus root.
 
 ---
 
@@ -32,7 +35,7 @@ So the index is *derived*. It cannot disagree with the task files, because it is
 thrown away and rebuilt from them. And there is a check that proves it:
 
 ```bash
-python3 tools/generate_task_index.py --check
+python3 -I -B .campus-os/kernel/tools/generate_task_index.py --tasks dean/tasks --out dean/TASKS.md --check
 ```
 
 A mismatch means one of two things, both worth knowing:

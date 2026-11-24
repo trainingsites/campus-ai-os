@@ -2,9 +2,9 @@
   "name": "campus-ai-os",
   "interface": {
     "displayName": "Campus AI OS",
-    "shortDescription": "Free AI operating system for education businesses: a chief of staff, departments and starter staff.",
+    "shortDescription": "Your Chief of Staff Agent: one AI you talk to, with departments and starter staff.",
     "developerName": "TrainingSites.io",
-    "websiteURL": "https://trainingsites.io/os"
+    "websiteURL": "https://trainingsites.io/"
   },
   "plugins": [
     {

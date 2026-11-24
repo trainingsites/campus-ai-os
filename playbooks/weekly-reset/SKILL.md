@@ -5,6 +5,8 @@ description: The Monday reset — review last week, set this week's priorities, 
 
 # Playbook — Weekly Reset
 
+**PURPOSE:** turn three starter employees (weekly review, priorities, social plan) into one recurring Monday habit on a cadence trigger; the evidence is each week's run dir (`results.json` + per-stage ledger lines) and the owner's reviewed focus list.
+
 **The recurring habit.** Once a week, Dean runs the same three-step reset: review the week that ended, surface this week's priorities, and plan the week's social from those priorities. It demonstrates a **recurring, scheduled-task-compatible** playbook — the same contract as the flagship, wired to a cadence trigger instead of an event.
 
 Dean runs this. Read `playbooks/README.md` (the runtime) once before your first playbook run.

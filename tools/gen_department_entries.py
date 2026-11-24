@@ -27,7 +27,7 @@ orchestrator/platform meta records and are left untouched.
 - Deterministic, stdlib only. Run before packaging; the promise-parity gate
   (`--check`) then verifies rosters == shipped skills.
 
-Usage:  python3 tools/gen_department_entries.py [--check]
+Usage:  python3 tools/gen_department_entries.py --help   (every write needs an explicit mode, 5.3.8)
 """
 import json, os, re, sys, glob
 
@@ -38,7 +38,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # a live campus too, because skills ship in the plugin, not in the campus. Only
 # the WRITE TARGET differs:
 #
-#   default        -> ROOT/templates/registry.json   (packaging time)
+#   --pack NAME    -> ROOT/templates/registry.json   (packaging time; never the bare default, 5.3.8)
 #   --campus PATH  -> PATH/.campus-os/registry.json  (a real, live campus)
 #
 # One generator, two targets - the same shape as lint_managers.py's
@@ -346,11 +346,49 @@ def collisions(teams, systems):
     return hits
 
 
+USAGE = """Usage: python3 tools/gen_department_entries.py <one mode> [--pack NAME]
+
+  --check                 read-only: compare the plugin's registry template with shipped skills
+  --check --campus PATH   read-only: the same comparison for one campus's registry
+  --campus PATH           WRITES PATH/.campus-os/registry.json (re-derives its org chart)
+  --pack NAME             packaging only: WRITES the plugin's own templates/registry.json
+  --confirm-rename RENAME with --campus: allow renaming the departments of a campus that records
+                          no edition (only after the owner typed RENAME; see /update-workspace)
+  -h, --help              print this and write nothing
+
+Run with no mode, an unknown option or a missing value: prints this, writes nothing."""
+
+
+def parse_args(argv):
+    """5.3.8: every write needs an explicit mode. Before this, a bare run or `--help` fell through
+    to the packaging default and rewrote the plugin's own templates/registry.json (field report
+    2026-11-23: an assistant asked for the options during an update and the template was rewritten)."""
+    opts = {"check": False, "campus": None, "pack": None, "confirm-rename": None}
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ("-h", "--help"):
+            print(USAGE); sys.exit(0)
+        if a == "--check":
+            opts["check"] = True
+        elif a in ("--campus", "--pack", "--confirm-rename"):
+            if i + 1 >= len(argv) or argv[i + 1].startswith("-") or not argv[i + 1].strip():
+                print("REFUSED: %s needs a value (a path that starts with '-' is written ./-name); "
+                      "nothing written.\n\n%s" % (a, USAGE)); sys.exit(2)
+            opts[a[2:]] = argv[i + 1]
+            i += 1
+        else:
+            print("REFUSED: unknown option %r; nothing written.\n\n%s" % (a, USAGE)); sys.exit(2)
+        i += 1
+    if not (opts["check"] or opts["campus"] or opts["pack"]):
+        print("REFUSED: no mode given; nothing written.\n\n%s" % USAGE); sys.exit(2)
+    return opts
+
+
 def main():
-    check = "--check" in sys.argv
-    campus = None
-    if "--campus" in sys.argv:
-        campus = sys.argv[sys.argv.index("--campus") + 1]
+    opts = parse_args(sys.argv[1:])
+    check = opts["check"]
+    campus = opts["campus"]
     REG = registry_path(campus)
     if not os.path.isfile(REG):
         print("no registry at", REG); sys.exit(1)
@@ -362,11 +400,48 @@ def main():
         pack = json.load(open(os.path.join(ROOT, "packs", "active.json"), encoding="utf-8")).get("active_pack") or pack
     except (OSError, ValueError):
         pass
-    if "--pack" in sys.argv:
-        pack = sys.argv[sys.argv.index("--pack") + 1]
+    if opts["pack"]:
+        pack = opts["pack"]
+    # 5.3.5: never relabel a campus for another edition. The campus records the edition it was
+    # founded with (workspace.json -> pack); /update-workspace stops on a mismatch, and this is
+    # the same refusal in code, because this tool is what rewrites the department labels.
+    campus_pack = None
+    if campus and not check:
+        try:
+            campus_pack = json.load(open(os.path.join(campus, "workspace.json"), encoding="utf-8")).get("pack")
+        except (OSError, ValueError, AttributeError):
+            campus_pack = None
+        if not isinstance(campus_pack, str):
+            campus_pack = None
+        if campus_pack and campus_pack != pack:
+            print("REFUSED: this campus was founded with the '%s' edition and the pack being applied is '%s'; "
+                  "nothing written. Run /update-workspace for the two ways forward." % (campus_pack, pack))
+            sys.exit(3)
+    if not os.path.isfile(os.path.join(ROOT, "packs", pack, "pack.json")):
+        print("REFUSED: no pack named %r in this plugin (packs/%s/pack.json); nothing written." % (pack, pack))
+        sys.exit(2)
     labels = resolve_labels(os.path.join(ROOT, "packs", pack, "pack.json"))
     roster, systems = collect()
     fresh = build_entries(roster, systems, labels)
+    # 5.3.8: a campus that records no edition and whose department names would change is being
+    # switched to another edition (one renamed department is an owner's own rename; several are an
+    # edition). The skill asks the owner to type RENAME; this is the same gate in code.
+    if campus and not check and not campus_pack:
+        was = {t.get("team"): t.get("label") for t in teams if t.get("type") == "department"}
+        try:  # the same departments /update-workspace compares: the ones this pack names
+            pack_doc = json.load(open(os.path.join(ROOT, "packs", pack, "pack.json"), encoding="utf-8"))
+            named = {m.get("id") for m in pack_doc.get("managers", []) if isinstance(m, dict)}
+        except (OSError, ValueError, AttributeError):
+            named = set()
+        renames = sorted((e["team"], was[e["team"]], e.get("label")) for e in fresh
+                         if e.get("type") == "department" and e["team"] in named
+                         and was.get(e["team"]) not in (None, e.get("label")))
+        if len(renames) > 1 and opts["confirm-rename"] != "RENAME":
+            print("REFUSED: this campus records no edition and %d department names would change; nothing written." % len(renames))
+            for team, old, new in renames:
+                print("  {:16s} {!r} -> {!r}".format(team, old, new))
+            print("Run /update-workspace: it shows these renames and asks the owner to type RENAME.")
+            sys.exit(3)
 
     owned = set(EMP_DEPTS) | {"campus-systems"}
     existing = {t["team"]: t for t in teams

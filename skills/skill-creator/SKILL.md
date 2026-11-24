@@ -1,7 +1,8 @@
 ---
 name: skill-creator
 description: >
-  Create a new skill that packages a workflow into a reusable SKILL.md. Use
+  Campus skill builder: create a new campus skill that packages a workflow into a
+  reusable SKILL.md filed in this campus's departments and registry. Use
   when the owner says "create a skill", "make a new skill", "turn this into a
   skill", or asks to build a reusable process. Also called as a sub-step by
   promote-skills to draft candidate bodies.

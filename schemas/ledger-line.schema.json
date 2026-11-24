@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "campus-ai-os:ledger-line.schema.json",
+  "title": "Activity-ledger line - Campus AI OS, one shape for registered and ad-hoc runs",
+  "description": "ONE line shape for every activity-ledger line (Campus AI OS 5.3.0 item 4, agent-activity-logging standard, kernel half). Registered skill runs, playbook stages, scheduled jobs and ad-hoc turns all write this shape; an ad-hoc turn writes `skill: \"ad-hoc\"` and logs ONLY when it produced an output, a write or a decision (pure conversation does not log). WRITE side (`tools/validate_ledger.py --write`): the `required` keys must be present and every key typed as below. READ side (default): lines written before this schema (no `seat`, `timestamp` instead of `ts`, extra keys) are legacy, never failures; only a key that IS present with the wrong type fails. Extra keys are always allowed. Canon for where a line goes: templates/ledger-paths.md. Validator subset: tools/validate_results.py (type, required, enum, pattern, properties, items, minItems) plus `minimum`, applied by tools/validate_ledger.py.",
+  "type": "object",
+  "required": [
+    "ts",
+    "seat",
+    "skill",
+    "dept",
+    "outcome"
+  ],
+  "properties": {
+    "ts": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}",
+      "$comment": "ISO 8601 date-time, UTC preferred (a bare date is read-accepted). Legacy lines may carry `timestamp` instead; read side accepts them."
+    },
+    "seat": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]*$",
+      "$comment": "The seat resolve-seat.py returned. Never a literal copied from an example."
+    },
+    "session": {
+      "type": "string"
+    },
+    "platform": {
+      "type": "string"
+    },
+    "via": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "observed",
+        "host-binding",
+        "unresolved",
+        null
+      ],
+      "$comment": "The `via` the seat resolver returned. New lines use these words only (write side); older words such as binding-file-read read as legacy, never as failures."
+    },
+    "skill": {
+      "type": "string",
+      "$comment": "The registered skill or playbook stage that ran, or \"ad-hoc\" for work with no matching skill."
+    },
+    "skill_version": {
+      "type": "string",
+      "$comment": "OPTIONAL (5.3.0, WikiSkill B): the `version` in the running skill's or playbook's frontmatter, read from the file and never typed from memory. Absent on ad-hoc lines and on lines written before 5.3.0."
+    },
+    "logged_for": {
+      "type": "string",
+      "enum": [
+        "output",
+        "write",
+        "decision"
+      ],
+      "$comment": "OPTIONAL, recommended on ad-hoc lines: why this turn logged. The logging rule is: an ad-hoc turn logs only for an output, a write or a decision."
+    },
+    "trigger": {
+      "type": "string"
+    },
+    "dept": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "$comment": "Canon spelling is `dept` (NICHE-009); never `team` for this field."
+    },
+    "outcome": {
+      "type": "string",
+      "$comment": "completed | errored | abandoned | partial, or a short owner-readable phrase (legacy)."
+    },
+    "files_touched": {
+      "type": [
+        "integer",
+        "array"
+      ],
+      "minimum": 0
+    },
+    "run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "output": {
+      "type": "string",
+      "$comment": "Relative path to the artifact, or \"\"."
+    },
+    "external_ref": {
+      "type": [
+        "string",
+        "integer",
+        "null"
+      ]
+    },
+    "tier_requested": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "$comment": "light | full (model-routing.md)."
+    },
+    "tier_used": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "$comment": "light | full - what actually ran (model-routing.md)."
+    },
+    "provider": {
+      "type": "string",
+      "$comment": "RESERVED for 5.3.1 (routing adapter), optional now: which provider served the call - e.g. host, local, openrouter. Absent = the host model."
+    },
+    "model": {
+      "type": "string",
+      "$comment": "RESERVED for 5.3.1, optional now: the model id actually served."
+    },
+    "tokens_in": {
+      "type": "integer",
+      "minimum": 0,
+      "$comment": "RESERVED for 5.3.1, optional now."
+    },
+    "tokens_out": {
+      "type": "integer",
+      "minimum": 0,
+      "$comment": "RESERVED for 5.3.1, optional now."
+    },
+    "cost": {
+      "type": "number",
+      "minimum": 0,
+      "$comment": "RESERVED for 5.3.1, optional now: USD for this line's calls. Absent means not measured, never zero by default."
+    }
+  }
+}

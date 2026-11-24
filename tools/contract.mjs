@@ -144,7 +144,12 @@ export class Resolver {
     const valid = Boolean(object(info) && typeof info.seat === 'string' && fullmatch(this.seatRx, info.seat) && this.seat.roles.includes(info.role));
     const state = valid ? 'valid' : info === null ? 'missing' : 'invalid';
     const role = valid ? info.role : 'satellite', seat = valid ? info.seat : 'unknown';
-    const ledger = this.seat.ledger[valid ? role : 'unknown'].replaceAll('{seat}', seat);
+    // SEC-05: the shared ledger follows `owns_clock` (resolve-seat.py output), never role alone; fail closed.
+    const key = !valid ? 'unknown'
+      : role === 'primary' && info.owns_clock === true ? 'primary'
+      : role === 'primary' ? (Object.hasOwn(this.seat.ledger, 'co_primary') ? 'co_primary' : 'satellite')
+      : 'satellite';
+    const ledger = this.seat.ledger[key].replaceAll('{seat}', seat);
     const lane = role === 'satellite' ? this.seat.lane.satellite.replaceAll('{seat}', seat) : null;
     return {state, role, seat, ledger, lane};
   }

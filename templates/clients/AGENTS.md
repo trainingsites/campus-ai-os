@@ -3,30 +3,27 @@
 *(This file makes the campus operable from an OpenAI/Codex-compatible client.
 It is the SAME brain as `dean/CLAUDE.md` — read that file first; it is the
 authoritative operating manual. This adapter only adds the lane rules below.
-Install: copy from the plugin's `templates/clients/AGENTS.md` to the campus
-root. Not installed by default.)*
+Founding installs it at the campus root when the owner says they use Codex
+or Antigravity;
+otherwise copy it from the plugin's `templates/clients/AGENTS.md` yourself.
+Until the owner makes Codex primary in `.campus-os/seat.json`, Codex is a
+satellite: it reads everything and proposes, and changes nothing shared.)*
 
-## Same brain, isolated lane
+## Same brain, resolver-driven lanes
 
 All clients read the same memory: `dean/memory.md`, `dean/TASKS.md`,
 `.campus-os/registry.json`, `shared/`, `wiki/`. One source of truth.
 
-But clients write in **isolated lanes** — never the same file at the same time:
+What you may WRITE is decided by the seat resolver, never by this file's
+defaults and never by the role you would like to have:
 
-1. **Your working lane is `active-work/lanes/codex/`.** Drafts, intermediate
-   work, and anything in progress goes there — never directly into another
-   client's lane (`active-work/lanes/*`) and never into files another client
-   may hold open.
-2. **Shared-memory writes are append-or-propose.** You may APPEND to
-   the ledger file `.campus-os/resolve-seat.py --client codex` returns for this seat, and to no other ledger (one JSON line per completed workflow — same schema
-   as dean/CLAUDE.md). Only the clock-owner client appends to `dean/.activity.jsonl`. For `dean/memory.md`, `dean/TASKS.md`, and `wiki/`,
-   write a proposal file to your lane (`memory-update-{date}.md`) instead of
-   editing in place; the owner's primary client merges it at its next session
-   end. This prevents two clients rewriting the same memory concurrently.
-3. **Finished work ships normally** to `outputs/YYYY-MM/` — completed
-   deliverables are append-only by month and filename-scoped, so lanes don't
-   collide there. Prefix the filename with `codex-` if a same-named file could
-   plausibly be produced by another client the same day.
+1. **Resolve first.** Run `python3 -I -B .campus-os/resolve-seat.py --client codex` once at session start and use the returned `seat`, `role`, `owns_clock`, `ledger` and `lane` exactly (canon: `.campus-os/ledger-paths.md`).
+   **Any other app reading this file** (Antigravity, for one) uses its own client name in place of `codex` everywhere in this file: `--client antigravity`, and `antigravity-` as the filename prefix. Never resolve under another app's name.
+2. **Unresolved means satellite.** If the resolver warns, exits 2 or cannot run, say so visibly to the owner and act as a satellite; never assume primary.
+3. **The ledger follows `owns_clock`, never role.** Append one JSON line per completed workflow to the returned `ledger` and to no other file; only a result with `owns_clock: true` writes `dean/.activity.jsonl`, and every other seat writes its own shard `dean/.activity.{seat}.jsonl`. Only the clock-owner client appends to `dean/.activity.jsonl`.
+4. **Satellites get their lane and their own shard, nothing else.** A satellite writes only inside its returned `lane` and its own ledger shard: no `outputs/`, no `dean/memory.md`, `dean/TASKS.md`, `dean/tasks/`, `wiki/`, `shared/` or `.campus-os/registry.json`; it proposes changes as files under `{lane}proposals/` for a primary to merge.
+5. **A primary without the clock** (`role: primary`, `owns_clock: false`) may write shared state and ship finished work to `outputs/YYYY-MM/` (prefix the filename with `codex-` if a same-named file could plausibly come from another client that day), re-reading a file before editing it, but it runs no recurring jobs and keeps its own ledger shard.
+6. **Only the clock owner runs schedules.** Recurring jobs and the shared ledger belong to the one client whose result says `owns_clock: true`.
 
 ## Rules that do not soften off-Claude
 

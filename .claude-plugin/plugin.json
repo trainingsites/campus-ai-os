@@ -1,6 +1,6 @@
 {
   "name": "campus-ai-os",
-  "version": "5.2.18",
+  "version": "5.3.8",
   "description": "Campus AI OS - the complete starter campus. The kernel (chief of staff Dean, founding onboarding, campus doctor, dashboard, wiki memory, self-authoring skill loop) plus 4 scaffolded department managers and a full starter staff of AI employees (morning brief, weekly review, offer and course builders, email sequences, social planner, and more). Also a playbooks runtime that runs multi-step workflows end to end, built-in workforce governance, and optional per-stage model routing.",
   "author": {
     "name": "trainingsites.io",

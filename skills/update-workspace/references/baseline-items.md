@@ -12,7 +12,7 @@ for THIS host.
 ## Entry points (Step 0, Marker < `OS_VERSION`)
 
 Pick the earliest entry point that matches and run from there; every path
-then ends with the closing rule (items 11-15 and the `OS_VERSION` stamp).
+then ends with the closing rule (items 11-18 and the `OS_VERSION` stamp).
 
 | `workspace.json` says | Run |
 |---|---|
@@ -82,7 +82,7 @@ entry file, memory.md, TASKS.md, each shared file) - never recursively copy
    of staff.
 3. **`dean/{ENTRY_FILE}` - insert, never rebuild.** Compare against the
    kernel template's known sections. Insert ONLY the blocks that are
-   missing: the three safety rules, the registry-read line in Start of
+   missing: the safety rules, the registry-read line in Start of
    Session, the activity-ledger habit in End of Session.
 
    | Rule | Marker (present = skip) | Insert where |
@@ -90,6 +90,8 @@ entry file, memory.md, TASKS.md, each shared file) - never recursively copy
    | inputs/ write-protection | text covering "inputs/ is read-only" | inside the file-routing / "Where Files Go" section, after the inputs/ line |
    | Reversibility Rule | a "Reversibility" heading or equivalent wording | as its own section near routing rules |
    | One-Page Plan Rule | a "One-Page Plan" heading OR a "PRD-Gate" heading | as its own section after the routing/asks section |
+   | Work Orders (5.3.0) | text mentioning "Work Order" | one sentence inside the One-Page Plan rule pointing at `.campus-os/kernel/tools/wo.py` (the template's rule 3 wording) |
+   | Challenge-First Rule (5.3.0) | a "Challenge" rule or wording that says to push back before price, offer or build decisions | as the next numbered safety rule (the template's rule 5) |
 
    If an anchor is missing, append the block at the end of the file with a
    one-line HTML comment noting the anchor was missing. **PRD-Gate special

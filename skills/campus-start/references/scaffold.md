@@ -77,7 +77,7 @@ active-work/  inputs/  outputs/  wiki/  daily/
   staff org - the `type: department` entries with their rosters plus a
   `campus-systems` entry - so the doctor and campus-map derive the staff line
   from the registry in EVERY filing mode. Do not hand-build these. (The
-  education pack default reads "23 employees + 20 campus systems + 2
+  education pack default reads "23 employees + 23 campus systems + 2
   playbooks"; the counts are always derived, never asserted.)
 - The goals file is a three-line DEFAULT stub, not an interview at founding:
   the one number, the horizon, this week's focus, each a fill-in prompt. The
@@ -165,6 +165,10 @@ redirect.
   literal. On a re-run, never regress a marker already equal to or higher
   than `OS_VERSION`.
 - `created` - the date.
+- `pack` - the id of the edition this campus was founded with: `active_pack` from the
+  plugin's `packs/active.json`, read at runtime, never a literal. Written once at founding.
+  `/update-workspace` reads it to refuse a silent switch to another edition; a campus
+  founded before 5.3.5 has no `pack` key and gets one on its first update.
 
 ## Kernel kit (`.campus-os/kernel/`)
 
@@ -186,6 +190,44 @@ of the plugin's `tools/kit-manifest.json`.
    rule; `/campus-doctor` reports it.
 
 Kit files hold no owner data. Never edit them; updates replace them.
+
+## Job cards (`dean/job-cards.md`) - only when the pack ships them
+
+If the plugin has `packs/{active_pack}/job-cards.md`, copy it to `dean/job-cards.md` at
+founding, and only when that file is absent. A job card is one job the owner hands over:
+what it is, what it needs, the rules, what done looks like and where the result lands. The
+file may end with playbooks: named sets of those cards that run together, in order. The
+copy is the owner's from then on: they edit it, add cards and reorder it, and no update
+overwrites it. A pack with no `job-cards.md` founds exactly as before; never write an empty
+file and never invent cards.
+
+## Seat (`.campus-os/seat.json`) - who may write
+
+Written once, from the Step 2b answer, after the kit and `.campus-os/resolve-seat.py` exist.
+`{client}` is this host's client name as `PLATFORM.md` resolves it (`claude-code`,
+`claude-cowork` or `codex`); other apps use the same names, and an app with no name
+there uses its own in lowercase with hyphens (`antigravity`, `gemini`).
+
+```
+python3 -I -B .campus-os/resolve-seat.py --init-seat --primary {client} [--satellite {other} ...]
+```
+
+- An app the owner gave "the same say" is a second `--primary`; then add
+  `--clock-owner {client}` so this app keeps the schedules.
+- The tool reads this computer's own id (macOS, Windows or Linux) and never overwrites an
+  existing `seat.json`. Exit 2 with `not observed` means this session cannot see the machine (a
+  sandboxed or cloud session): finish founding and tell the owner, in one line, to run the same
+  command once in a terminal in the campus folder. Until then every app is a satellite.
+- Then check it: `python3 -I -B .campus-os/resolve-seat.py --client {client}` must say
+  `primary`.
+- **Codex named:** when this campus's root entry file is not `AGENTS.md`, copy the plugin's
+  `templates/clients/AGENTS.md` to the campus root as `AGENTS.md`, filling `{assistant_name}`.
+  Founded in Codex and the owner names a Claude app: write the root `CLAUDE.md` redirect above.
+  Never overwrite an existing root entry file.
+- **Antigravity named:** install that same `AGENTS.md` and also copy
+  `templates/clients/GEMINI.md` to the campus root as `GEMINI.md`, filling `{assistant_name}`.
+  **Gemini named:** the same two files. Both tell the app to resolve under its own
+  name. Never overwrite an existing file.
 
 ## Parity and idempotency with `/update-workspace`
 

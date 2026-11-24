@@ -6,7 +6,7 @@ description: >
   built to match; niche framing from the active pack. Use when
   the owner says "/campus-start", "set up my campus", "found my campus", or
   when no campus exists.
-version: 5.2.18
+version: 5.3.8
 department: kernel
 ---
 
@@ -45,8 +45,13 @@ better?" and WAIT; record `assistant_name`; "keep it" IS the confirmation.
 **Beat 2 - the fork,** explicit, full first (wording in `interview.md`):
 **A) Full onboarding (default)** -> ask only the filing question (Q4), build
 the shell (files DEFAULT), run /full-onboarding. **B) Quick start** -> four
-questions one at a time, build, seed (SEEDED), First Win. No third path; B
-is never chosen silently.
+questions one at a time, build, seed (SEEDED), First Win. **C) Start from
+what I have** -> ask only the filing question (Q4), build the shell (files
+DEFAULT), run /campus-intake (it reads the owner's documents, links and AI
+memory, writes files as SEEDED, plays them back, asks only the gaps). B and
+C are never chosen silently. Answers the owner hands over in a file do not
+skip this beat: show all three options, then take the choice the file
+names; if it names none, ask.
 
 ## Step 1b - Four quick questions (path B), ONE AT A TIME
 
@@ -105,21 +110,35 @@ every `type: department` entry behind `{DEPT_LABELS}`, skipping `dean-office`
 `departments/{id}/`) with a charter stub. An unstaffed department still gets
 its folder; the folders match the org chart exactly. Then confirm, as **its
 own turn**: "Starting departments: {DEPT_LABELS} - rename or change any?"
-Wait for the answer and apply any rename before Step 3. **Clients / Projects / Mix:** `clients/_template/`,
+Wait for the answer and apply any rename before Step 2b. **Clients / Projects / Mix:** `clients/_template/`,
 `projects/_template/`, or both.
+
+**Job cards.** If the plugin has `packs/{active_pack}/job-cards.md`, copy it
+to `dean/job-cards.md` when absent (`scaffold.md` -> "Job cards"). A pack
+without one founds as before.
+
+## Step 2b - Which AI apps will work here (its own turn)
+
+Ask once, wording in `interview.md` (Step 2b): which AI apps the owner will
+use with this campus on this computer. Then write `.campus-os/seat.json`
+from the answer (`scaffold.md` -> "Seat"): THIS app is primary and runs the
+schedules; every other app the owner names starts **proposal-only**
+(satellite) until the owner promotes it. Never guess an app the owner did
+not name. If the seat cannot be written here, say so in one line with the
+command to run later; founding still finishes.
 
 `workspace.json` (schema in `scaffold.md`): `assistant_name`; the `business`
 OBJECT; `structure` plus EXACTLY the matching filing key; `version` =
-`OS_VERSION`; `created`. `.campus-os/model-routing.md` only if absent; never
+`OS_VERSION`; `created`; `pack` = the plugin's `active_pack`. `.campus-os/model-routing.md` only if absent; never
 regress a version marker.
 
 ## Step 3 - The founding close
 
 "{Name} here - your campus exists. Your campus is on v{OS_VERSION}." A ->
-/full-onboarding now; B -> /campus-first-win, then the setup ladder; never
+/full-onboarding now; C -> /campus-intake now; B -> /campus-first-win, then the setup ladder; never
 nag toward the full sit-down. No tours next. The close asks **exactly one
 question** (the next-step offer); the departments question was already its
-own turn in Step 2. Name departments only by their `{DEPT_LABELS}` label,
+own turn in Step 2, and the apps question in Step 2b. Name departments only by their `{DEPT_LABELS}` label,
 never by folder or id (the `education` department is shown as its label).
 
 ## Rules

@@ -50,6 +50,10 @@ def cases(c):
     for value in [*c['hosts']['clients'], *c['hosts']['entry_file_by_manifest_dir'], 'unknown', '__proto__']:
         rows.append(('entry_file', [value]))
     for value in [{'seat': 'owner', 'role': 'primary'}, {'seat': 'worker', 'role': 'satellite'},
+                  {'seat': 'owner', 'role': 'primary', 'owns_clock': True},
+                  {'seat': 'peer', 'role': 'primary', 'owns_clock': False},
+                  {'seat': 'worker', 'role': 'satellite', 'owns_clock': True},
+                  {'seat': 'owner', 'role': 'primary', 'owns_clock': 'yes'},
                   None, {'seat': 'worker', 'role': 'bogus'}, {'seat': '../escape', 'role': 'primary'},
                   {}, [], 'malformed', {'seat': 'worker\n', 'role': 'primary'}]:
         rows.append(('ledger_path', [json.dumps(value)]))
@@ -194,7 +198,7 @@ class PythonResolvers(CopyFixture):
         for fn, arg, key, expected in [('resolve_context', 'new-owner.md', 'canonical', 'new-owner.md'),
                                       ('normalize_status', 'PAUSED', 'canonical', 'paused'),
                                       ('entry_file', 'new-host', 'entry_file', 'ENTRY.txt'),
-                                      ('ledger_path', '{"role":"primary","seat":"owner"}', 'ledger', 'records/owner.jsonl')]:
+                                      ('ledger_path', '{"role":"primary","seat":"owner","owns_clock":true}', 'ledger', 'records/owner.jsonl')]:
             p = self.cli('python', fn, arg, env=env)
             self.assertEqual(p.returncode, 0, p.stdout + p.stderr)
             self.assertEqual(json.loads(p.stdout)[key], expected)
@@ -253,7 +257,7 @@ class JavaScriptParity(CopyFixture):
             (self.kernel / rel['path']).unlink()
         env = dict(self.env, CAMPUS_CONTRACT=str(override))
         for fn, args in [('resolve_context', ['new-owner.md']), ('normalize_status', ['PAUSED']),
-                         ('entry_file', ['new-host']), ('ledger_path', ['{"role":"primary","seat":"owner"}']),
+                         ('entry_file', ['new-host']), ('ledger_path', ['{"role":"primary","seat":"owner","owns_clock":true}']),
                          ('run_dir', ['playbook', 'demo-team', 'demo', CANONICAL, 'true'])]:
             py = self.cli('python', fn, *args, env=env)
             js = self.cli('javascript', fn, *args, env=env)

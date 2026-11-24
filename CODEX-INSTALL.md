@@ -63,7 +63,7 @@ folder is a valid marketplace. Two steps:
 ### From the CLI
 
 ```bash
-codex plugin marketplace add ~/TrainingSites/Claude-Cowork/library/plugins/codex-marketplace
+codex plugin marketplace add /path/to/your/local-marketplace-root
 codex plugin list
 codex plugin install campus-ai-os
 ```
@@ -116,7 +116,7 @@ codex plugin list
 
 ---
 
-## Three things that behave differently from Claude
+## Four things that behave differently from Claude
 
 ### 1. There are no slash commands
 
@@ -124,7 +124,7 @@ Codex's plugin format has **no `commands/` directory.** Its nearest equivalent �
 custom prompts in `~/.codex/prompts` — is local-only, cannot ship inside a
 plugin, and is marked deprecated by OpenAI, which points to skills instead.
 
-This package ships 27 commands. **On Codex they do nothing.** The 30 skills
+The Claude package ships slash commands. **On Codex they do nothing.** The skills
 behind them all work — invoke them by name or by intent instead:
 
 | On Claude | On Codex |
@@ -166,6 +166,35 @@ in the root entry file, it will silently truncate. Raise the cap in
 ```toml
 project_doc_max_bytes = 65536
 ```
+
+### 4. Using Codex and Claude on the same campus
+
+Two AIs that both think they own your files will overwrite each other. The campus
+settles it with one small file, `.campus-os/seat.json`, that says which apps on this
+computer may change shared files:
+
+- **Primary** apps write the campus. One of them, the **clock owner**, also runs
+  anything on a schedule and keeps the main activity log.
+- **Satellite** apps read everything and *propose* changes as files in their own lane
+  (`active-work/lanes/{seat}/proposals/`). They change nothing shared.
+
+`/campus-start` asks which apps you use and writes the file: the app you founded in is
+primary, and every other app starts as a satellite. To give Codex the same say, change
+its `role` to `"primary"` in `.campus-os/seat.json` (keep `clock_owner` pointing at one
+app). Codex checks its seat at the start of every session:
+
+```bash
+python3 -I -B .campus-os/resolve-seat.py --client codex
+```
+
+No `seat.json` yet (a campus founded before 5.3.0)? Run this once in a terminal in the
+campus folder, naming the app that should run the schedules:
+
+```bash
+python3 -I -B .campus-os/resolve-seat.py --init-seat --primary claude-code --satellite codex
+```
+
+It works on macOS, Windows and Linux, and it never overwrites an existing `seat.json`.
 
 ---
 

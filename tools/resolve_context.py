@@ -58,8 +58,8 @@ def child_campuses(start: Path, entry_names) -> list:
 def find_campus(start: Path, entry_names):
     """Walk up from the start folder; else accept exactly ONE campus among its children.
 
-    Hosts often open the folder ABOVE the campus (Cowork mounting `TrainingSites/` when the campus is
-    `TrainingSites/Claude-Cowork/`). Two or more child campuses are never guessed between: the owner
+    Hosts often open the folder ABOVE the campus (Cowork mounting `MyBusiness/` when the campus is
+    `MyBusiness/Campus/`). Two or more child campuses are never guessed between: the owner
     picks. Returns (campus or None, how: "here" | "above" | "child" | None, candidates)."""
     start = start.resolve()
     for folder in (start, *start.parents):

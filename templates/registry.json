@@ -1,5 +1,5 @@
 {
-  "campus_os_version": "5.2.18",
+  "campus_os_version": "5.3.8",
   "updated": "2026-07-29",
   "teams": [
     {
@@ -7,12 +7,11 @@
       "type": "kernel",
       "role": "chief orchestrator",
       "status": "active",
-      "version": "5.2.18",
+      "version": "5.3.8",
       "department": "dean",
       "owns": "Chief orchestrator - routes work to the right team, runs playbooks, guards reversibility, keeps memory and the activity ledger.",
       "triggers": [
         "dean",
-        "what should I work on",
         "route this",
         "run the playbook"
       ],
@@ -24,7 +23,7 @@
       "team": "campus-ai-os",
       "type": "kernel",
       "status": "active",
-      "version": "5.2.18",
+      "version": "5.3.8",
       "department": "dean",
       "owns": "Campus platform - founding, upgrades, full and quick onboarding, health checks, first-win, dashboard, wiki memory, self-authoring loop, playbooks runtime, workforce governance.",
       "triggers": [
@@ -45,7 +44,7 @@
       "type": "kernel",
       "role": "strategy and research",
       "status": "active",
-      "version": "5.2.18",
+      "version": "5.3.8",
       "department": "dean",
       "owns": "Strategy and research - the team you think with first and report to last. Runs the brainstorming council, researches and validates a topic, emits the brief every execution team reads, and reads back what shipped. Plans and learns; never publishes.",
       "triggers": [
@@ -199,6 +198,7 @@
         "brief-builder",
         "campus-doctor",
         "campus-first-win",
+        "campus-intake",
         "campus-map",
         "campus-start",
         "first-week",
@@ -207,6 +207,7 @@
         "hr-registry",
         "hr-review",
         "hr-router",
+        "import-ai-memory",
         "niche-config-builder",
         "output-router",
         "promote-skills",

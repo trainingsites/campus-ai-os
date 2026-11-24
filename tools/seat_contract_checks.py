@@ -449,7 +449,7 @@ def render(a, b, c, verbose=False, seat_info=None, d=None):
     elif d and d["status"] == "expired":
         lines.append(f"[!!] Host binding for '{d['client']}' {d['why']}. Sandboxed sessions of the "
                      f"primary client are satellites until it is re-issued: run "
-                     f"`python3 .campus-os/resolve-seat.py --issue-binding --client {d['client']}` on the host.")
+                     f"`python3 -I -B .campus-os/resolve-seat.py --issue-binding --client {d['client']}` on the host.")
     elif d and d["status"] == "invalid":
         lines.append(f"[!!] Host binding unusable ({d['why']}) - delete {d['path']} and re-issue it from the host.")
 
